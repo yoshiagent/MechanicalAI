@@ -41,6 +41,10 @@ header {
   padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
   border-bottom: 1px solid var(--line);
 }
+.titlebox { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.back { color: var(--callout-fg); text-decoration: none; font-size: 0.85rem; white-space: nowrap; }
+.back:hover { text-decoration: underline; }
+.back:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
 h1 { margin: 0; font-size: 1.15rem; font-weight: 700; letter-spacing: 0.02em; text-wrap: balance; }
 h1 small { font-weight: 400; color: var(--muted); font-size: 0.8rem; margin-left: 8px; letter-spacing: 0.04em; }
 .tabs { display: flex; gap: 4px; background: var(--deep); border: 1px solid var(--line); border-radius: 8px; padding: 3px; }
@@ -111,7 +115,7 @@ footer { color: var(--muted); font-size: 0.75rem; }
 <div class="app">
   <div class="progress" aria-hidden="true"><i id="bar"></i></div>
   <header>
-    <h1>差速器組裝與運轉<small>Open Differential · LEGO 十字軸版</small></h1>
+    <div class="titlebox"><a class="back" href="../">← 機構學</a><h1>差速器組裝與運轉<small>Open Differential · LEGO 十字軸版</small></h1></div>
     <div class="tabs" role="tablist" aria-label="模式">
       <button id="tab-asm" role="tab" aria-selected="true">組裝步驟</button>
       <button id="tab-run" role="tab" aria-selected="false">運轉示範</button>
