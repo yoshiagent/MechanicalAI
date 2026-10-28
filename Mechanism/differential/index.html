@@ -261,6 +261,24 @@ footer { color: var(--muted); font-size: 0.75rem; }
   const grid = new THREE.GridHelper(240, 24, 0x2d3f55, 0x18263a);
   grid.rotation.x = Math.PI / 2; grid.position.z = -34.05; scene.add(grid);
 
+  // "front" marker on the floor: +Y, the side away from the crank
+  const FRONT_COLOR = 0x4ade80;
+  const arrowShape = new THREE.Shape();
+  // right of the base, where the default view sees the floor unobstructed
+  [[46, -42], [54, -42], [54, -14], [61, -14], [50, 4], [39, -14], [46, -14]].forEach(([x, y], i) =>
+    (i ? arrowShape.lineTo(x, y) : arrowShape.moveTo(x, y)));
+  const arrow = new THREE.Mesh(new THREE.ShapeGeometry(arrowShape),
+    new THREE.MeshBasicMaterial({ color: FRONT_COLOR, transparent: true, opacity: 0.85, side: THREE.DoubleSide }));
+  arrow.position.z = -33.9; scene.add(arrow);
+  const label = document.createElement("canvas");
+  label.width = 256; label.height = 96;
+  const g2 = label.getContext("2d");
+  g2.fillStyle = "#4ade80"; g2.textAlign = "center"; g2.textBaseline = "middle";
+  g2.font = "bold 46px 'Noto Sans TC', 'Microsoft JhengHei', sans-serif"; g2.fillText("前方", 128, 34);
+  g2.font = "bold 26px system-ui, sans-serif"; g2.fillText("FRONT", 128, 76);
+  const tag = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(label), depthTest: false }));
+  tag.scale.set(28, 10.5, 1); tag.position.set(48, 16, -30); scene.add(tag);
+
   // decode the embedded meshes
   const data = JSON.parse($("parts-data").textContent);
   const b64 = (s) => Uint8Array.from(atob(s), (ch) => ch.charCodeAt(0)).buffer;
@@ -341,14 +359,15 @@ footer { color: var(--muted); font-size: 0.75rem; }
 
   function poseRun() {
     for (const m of Object.values(meshes)) { m.visible = true; m.material.emissive.setHex(0); }
-    const c = rad(st.caseA), d = rad(st.delta);
+    // front is +Y (away from the crank): a wheel rolling forward turns its top toward +Y, i.e. negative about X
+    const c = -rad(st.caseA), d = -rad(st.delta);
     for (const n of CASE) meshes[n].matrix.makeRotationX(c);
     for (const n of RIGHT) meshes[n].matrix.makeRotationX(c + d);
     for (const n of LEFT) meshes[n].matrix.makeRotationX(c - d);
     meshes["spider:top"].matrix.makeRotationX(c).multiply(R.makeRotationZ(-RATIO_SPIDER * d));
     meshes["spider:bottom"].matrix.makeRotationX(c).multiply(R.makeRotationZ(RATIO_SPIDER * d));
     T1.makeTranslation(PINION_AXIS_X, 0, 0); T2.makeTranslation(-PINION_AXIS_X, 0, 0);
-    M.copy(T1).multiply(R.makeRotationY(rad(-RATIO_RING * st.caseA))).multiply(T2);
+    M.copy(T1).multiply(R.makeRotationY(-RATIO_RING * c)).multiply(T2);
     for (const n of INPUT) meshes[n].matrix.copy(M);
     for (const n of ["frame", "sleeve:right", "sleeve:left"]) meshes[n].matrix.identity();
     $("bar").style.width = "100%";
