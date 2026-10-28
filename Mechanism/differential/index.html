@@ -209,7 +209,7 @@ footer { color: var(--muted); font-size: 0.75rem; }
     { t: "輸出軸 ×2", en: "Axles (LEGO 4L)", p: { "axle:right": [60, 0, 0], "axle:left": [-60, 0, 0] },
       li: ["LEGO 4L 十字軸，穿過立柱、軸套插進半軸齒輪", "可直接換用真正的 LEGO 軸"] },
     { t: "輪子 ×2", en: "Wheels", p: { "wheel:right": [45, 0, 0], "wheel:left": [-45, 0, 0] },
-      li: ["外側有箭頭，方便看出每個輪子轉了多少", "左輪藍色、右輪橘色，對應下方轉速表"] },
+      li: ["白色記號（兩面輻條＋胎面）方便看出每個輪子轉了多少", "左輪藍色、右輪橘色，對應下方轉速表"] },
     { t: "小齒輪", en: "Pinion", p: { "pinion": [0, -45, 0] },
       li: ["11 齒傘齒輪，和大齒輪咬合", "背面靠在前方立柱上"] },
     { t: "輸入軸", en: "Input Shaft (LEGO 3L)", p: { "pinion_shaft": [0, -60, 0] },
@@ -279,6 +279,24 @@ footer { color: var(--muted); font-size: 0.75rem; }
     m.matrixAutoUpdate = false;
     scene.add(m);
     meshes[p.name] = m;
+  }
+  // white index marks on both faces and the tread of each wheel, so its rotation reads from any view
+  // (the camera sits on the right, so the left wheel only ever shows its plain inner face)
+  const markMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.35, roughness: 0.4 });
+  for (const n of ["wheel:left", "wheel:right"]) {
+    const box = meshes[n].geometry.boundingBox ?? (meshes[n].geometry.computeBoundingBox(), meshes[n].geometry.boundingBox);
+    const r = box.max.z, w = box.max.x - box.min.x, xc = (box.max.x + box.min.x) / 2;
+    for (const x of [box.min.x - 0.2, box.max.x + 0.2]) {
+      // long spoke up, short spoke down: an asymmetric mark shows which way the wheel turns
+      for (const [z0, z1] of [[5, r - 0.5], [-5, -9]]) {
+        const bar = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.6, Math.abs(z1 - z0)), markMat);
+        bar.position.set(x, 0, (z0 + z1) / 2);
+        meshes[n].add(bar);
+      }
+    }
+    const tread = new THREE.Mesh(new THREE.BoxGeometry(w + 0.4, 3.2, 0.8), markMat);
+    tread.position.set(xc, 0, r + 0.2);
+    meshes[n].add(tread);
   }
   $("loading").hidden = true;
 
