@@ -129,17 +129,21 @@ footer { color: var(--muted); font-size: 0.75rem; }
       <button class="chip" id="xray" aria-pressed="false">透視殼體</button>
       <button class="chip" id="resetview">重設視角</button>
     </div>
-    <div class="legend">拖曳旋轉 · 滾輪／雙指縮放 · ← → 切換步驟 · 空白鍵播放</div>
+    <div class="legend">拖曳旋轉 · 滾輪／雙指縮放 · → 下一步 · ← 上一步 · 空白鍵自動播放</div>
   </div>
 
   <aside class="dock">
     <section id="panel-asm" class="row" style="display:grid;gap:10px">
       <div class="row">
-        <button class="btn" id="prev" aria-label="上一步">◀</button>
-        <button class="btn primary" id="play">▶ 播放</button>
-        <button class="btn" id="next" aria-label="下一步">▶</button>
-        <span class="stepno" id="stepno">步驟 1 / 12</span>
-        <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="組裝時間軸">
+        <button class="btn" id="prev">◀ 上一步</button>
+        <button class="btn primary" id="next">下一步 ▶</button>
+        <span class="stepno" id="stepno">爆炸圖 · 0 / 12</span>
+      </div>
+      <div class="row">
+        <button class="btn" id="play">▶ 自動播放</button>
+        <button class="btn" id="explode">爆炸圖</button>
+        <button class="btn" id="assemble">組合圖</button>
+        <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="組裝進度">
       </div>
       <div class="caption" id="caption"></div>
     </section>
@@ -190,34 +194,41 @@ footer { color: var(--muted); font-size: 0.75rem; }
   };
   const XRAY = ["frame", "carrier_left", "ring_half"];
 
-  // ---------- assembly steps (world mm offsets the parts fly in from) ----------
+  // ---------- assembly steps: exploded-view offsets (world mm from the assembled pose) ----------
+  // The case, sleeves, axles and wheels are lifted LIFT mm above the frame and spread along the
+  // output axis (X); the input-side parts spread forward along -Y. Gaps were checked against the
+  // part bounding boxes so no two parts overlap in the exploded pose.
+  const LIFT = 45;
   const STEPS = [
-    { t: "底座支架", en: "Frame", p: { "frame": [0, 0, 70] },
-      li: ["兩根平行立柱撐住輸出軸，前方立柱撐住輸入軸", "三根立柱四面都有三角形肋（Gusset）加強"] },
-    { t: "左殼與立柱", en: "Left Carrier", p: { "carrier_left": [-45, 0, 25] },
+    { t: "底座支架", en: "Frame", p: { "frame": [0, 0, 0] },
+      li: ["底座固定不動，其他零件從爆炸位置依序裝上", "兩根平行立柱撐住輸出軸，前方立柱撐住輸入軸", "三根立柱四面都有三角形肋（Gusset）加強"] },
+    { t: "左殼與立柱", en: "Left Carrier", p: { "carrier_left": [-45, 0, LIFT] },
       li: ["左殼上下兩根立柱，用來固定十字軸銷", "立柱末端的插銷之後插進右殼（大齒輪）"] },
-    { t: "行星齒輪 ×2", en: "Spider Gears", p: { "spider:top": [0, 0, 40], "spider:bottom": [0, 0, -40] },
+    { t: "行星齒輪 ×2", en: "Spider Gears", p: { "spider:top": [0, 0, LIFT + 16], "spider:bottom": [0, 0, LIFT - 16] },
       li: ["上下各一個 10 齒傘齒輪（Bevel Gear）", "可在十字軸銷上自由轉動，是差速作用的關鍵"] },
-    { t: "十字軸銷", en: "Cross Pin", p: { "cross_pin": [0, 0, 60] },
+    { t: "十字軸銷", en: "Cross Pin", p: { "cross_pin": [0, 0, LIFT + 55] },
       li: ["由上往下穿過立柱與兩個行星齒輪", "D 形斷面，卡在立柱孔裡不會轉"] },
-    { t: "半軸齒輪 ×2", en: "Side Gears", p: { "side_gear:right": [30, 0, 0], "side_gear:left": [-30, 0, 0] },
+    { t: "半軸齒輪 ×2", en: "Side Gears", p: { "side_gear:right": [16, 0, LIFT], "side_gear:left": [-16, 0, LIFT] },
       li: ["左右各一個 16 齒傘齒輪，同時和兩個行星齒輪咬合", "中心是 LEGO 十字孔，帶動輸出軸"] },
-    { t: "大齒輪（右殼）", en: "Ring Gear", p: { "ring_half": [55, 0, 0] },
+    { t: "大齒輪（右殼）", en: "Ring Gear", p: { "ring_half": [40, 0, LIFT] },
       li: ["33 齒大傘齒輪，同時是差速器殼的右半邊", "左殼立柱的插銷插進它的孔，整組成為一個殼"] },
-    { t: "軸套 ×2", en: "Sleeves", p: { "sleeve:right": [35, 0, 0], "sleeve:left": [-35, 0, 0] },
+    { t: "軸套 ×2", en: "Sleeves", p: { "sleeve:right": [50, 0, LIFT], "sleeve:left": [-52, 0, LIFT] },
       li: ["填滿殼體與立柱之間的空隙", "讓差速器殼不會左右滑動"] },
-    { t: "輸出軸 ×2", en: "Axles (LEGO 4L)", p: { "axle:right": [60, 0, 0], "axle:left": [-60, 0, 0] },
+    { t: "輸出軸 ×2", en: "Axles (LEGO 4L)", p: { "axle:right": [76, 0, LIFT], "axle:left": [-78, 0, LIFT] },
       li: ["LEGO 4L 十字軸，穿過立柱、軸套插進半軸齒輪", "可直接換用真正的 LEGO 軸"] },
-    { t: "輪子 ×2", en: "Wheels", p: { "wheel:right": [45, 0, 0], "wheel:left": [-45, 0, 0] },
+    { t: "輪子 ×2", en: "Wheels", p: { "wheel:right": [90, 0, LIFT], "wheel:left": [-92, 0, LIFT] },
       li: ["白色記號（兩面輻條＋胎面）方便看出每個輪子轉了多少", "左輪藍色、右輪橘色，對應下方轉速表"] },
-    { t: "小齒輪", en: "Pinion", p: { "pinion": [0, -45, 0] },
+    { t: "小齒輪", en: "Pinion", p: { "pinion": [0, -32, 0] },
       li: ["11 齒傘齒輪，和大齒輪咬合", "背面靠在前方立柱上"] },
-    { t: "輸入軸", en: "Input Shaft (LEGO 3L)", p: { "pinion_shaft": [0, -60, 0] },
+    { t: "輸入軸", en: "Input Shaft (LEGO 3L)", p: { "pinion_shaft": [0, -55, 0] },
       li: ["LEGO 3L 十字軸，穿過前方立柱插進小齒輪"] },
-    { t: "曲柄", en: "Crank", p: { "crank": [0, -45, 0] },
+    { t: "曲柄", en: "Crank", p: { "crank": [0, -62, 0] },
       li: ["套在輸入軸外端，轉動整台差速器", "曲柄半徑 15 mm（在 FreeCAD 調整過）"] },
   ];
-  const MOVE = 1.4, HOLD = 0.9, STEP_T = MOVE + HOLD, TOTAL = STEPS.length * STEP_T;
+  const N = STEPS.length;
+  const MOVE = 1.2, HOLD = 0.8;   // seconds per step move; pause between steps while auto-playing
+  const EXPLODED_INTRO = { t: "爆炸圖", en: "Exploded View",
+    li: ["所有零件分開排列在各自的組裝方向上，虛線指出要裝到哪裡", "按「下一步 ▶」或鍵盤 → 裝上一個步驟；「◀ 上一步」或 ← 拆回去", "「▶ 自動播放」會一步一步自動組裝完成"] };
   const stepOf = {};
   STEPS.forEach((s, k) => Object.keys(s.p).forEach((n) => (stepOf[n] = k)));
 
@@ -253,6 +264,12 @@ footer { color: var(--muted); font-size: 0.75rem; }
   camera.position.copy(HOME_POS);
   const controls = new THREE.OrbitControls(camera, canvas);
   controls.target.copy(HOME_TARGET);
+  // the exploded view spreads ~250 mm along X, so assembly mode starts further back
+  const ASM_POS = new THREE.Vector3(250, -305, 235), ASM_TARGET = new THREE.Vector3(0, -25, 35);
+  function homeView() {
+    const asm = st.mode === "asm";
+    camera.position.copy(asm ? ASM_POS : HOME_POS); controls.target.copy(asm ? ASM_TARGET : HOME_TARGET);
+  }
   controls.enableDamping = true;
   controls.minDistance = 60; controls.maxDistance = 600;
   scene.add(new THREE.HemisphereLight(0xdbeafe, 0x1e293b, 0.85));
@@ -319,7 +336,8 @@ footer { color: var(--muted); font-size: 0.75rem; }
   $("loading").hidden = true;
 
   // ---------- state ----------
-  const st = { mode: "asm", t: 0, playing: false, stopAt: TOTAL, scen: "straight", running: true, speed: 1,
+  // t: 0 = fully exploded, N = fully assembled; step s moves while s < t < s + 1. t eases toward target.
+  const st = { mode: "asm", t: 0, target: 0, playing: false, wait: 0, scen: "straight", running: true, speed: 1,
                crank: 0, caseA: 0, left: 0, right: 0, delta: 0, xray: false };
   const M = new THREE.Matrix4(), R = new THREE.Matrix4(), T1 = new THREE.Matrix4(), T2 = new THREE.Matrix4();
   const ease = (x) => 1 - Math.pow(1 - x, 3);
@@ -334,31 +352,55 @@ footer { color: var(--muted); font-size: 0.75rem; }
     }
   }
 
+  // dashed leader lines from each exploded part back to where it goes
+  const leaders = {};
+  const leaderMat = new THREE.LineDashedMaterial({ color: 0x94a3b8, dashSize: 2.5, gapSize: 2, transparent: true, opacity: 0.7 });
+  for (const [n, m] of Object.entries(meshes)) {
+    const off = STEPS[stepOf[n]].p[n];
+    if (!off[0] && !off[1] && !off[2]) continue;
+    m.geometry.computeBoundingBox();
+    const c = m.geometry.boundingBox.getCenter(new THREE.Vector3());
+    const g = new THREE.BufferGeometry().setFromPoints([c, c.clone()]);
+    const line = new THREE.Line(g, leaderMat);
+    line.userData = { c, off };
+    scene.add(line);
+    leaders[n] = line;
+  }
+
   function poseAssembly() {
-    st.t = Math.max(0, st.t);
-    const k = Math.min(STEPS.length - 1, Math.floor(st.t / STEP_T));
+    // the step being moved (or the last one finished); -1 = still fully exploded
+    const cur = st.t <= 1e-6 ? -1 : Math.min(N - 1, Math.ceil(st.t - 1e-6) - 1);
     for (const [n, m] of Object.entries(meshes)) {
       const s = stepOf[n];
-      const start = s * STEP_T;
-      if (st.t < start) { m.visible = false; continue; }
       m.visible = true;
-      const f = ease(Math.min(1, (st.t - start) / MOVE));
+      const u = 1 - ease(Math.max(0, Math.min(1, st.t - s)));   // 1 = exploded, 0 = in place
       const off = STEPS[s].p[n];
-      m.matrix.makeTranslation(off[0] * (1 - f), off[1] * (1 - f), off[2] * (1 - f));
-      const active = s === k && st.t < start + STEP_T;
+      m.matrix.makeTranslation(off[0] * u, off[1] * u, off[2] * u);
+      const active = s === cur;
       m.material.emissive.setHex(active ? 0x1d4ed8 : 0x000000);
       m.material.emissiveIntensity = active ? 0.35 : 0;
+      const line = leaders[n];
+      if (line) {
+        line.visible = u > 0.01;
+        const { c, off: o } = line.userData, a = line.geometry.attributes.position;
+        a.setXYZ(1, c.x + o[0] * u, c.y + o[1] * u, c.z + o[2] * u); a.needsUpdate = true;
+        line.computeLineDistances();
+      }
     }
-    $("bar").style.width = `${(st.t / TOTAL) * 100}%`;
-    $("scrub").value = String(Math.round((st.t / TOTAL) * 1000));
-    $("stepno").textContent = `步驟 ${k + 1} / ${STEPS.length}`;
-    const s = STEPS[k];
+    $("bar").style.width = `${(st.t / N) * 100}%`;
+    $("scrub").value = String(Math.round((st.t / N) * 1000));
+    $("stepno").textContent = cur < 0 ? `爆炸圖 · 0 / ${N}` : `步驟 ${cur + 1} / ${N}`;
+    const s = cur < 0 ? EXPLODED_INTRO : STEPS[cur];
     const html = `<h2>${s.t}<span class="en">${s.en}</span></h2><ul>${s.li.map((x) => `<li>${x}</li>`).join("")}</ul>`;
-    if ($("caption").dataset.k !== String(k)) { $("caption").innerHTML = html; $("caption").dataset.k = String(k); }
+    if ($("caption").dataset.k !== String(cur)) { $("caption").innerHTML = html; $("caption").dataset.k = String(cur); }
+    $("prev").disabled = st.target <= 0 && st.t <= 1e-6;
+    $("next").disabled = st.target >= N && st.t >= N - 1e-6;
+    setPlayLabel();
   }
 
   function poseRun() {
     for (const m of Object.values(meshes)) { m.visible = true; m.material.emissive.setHex(0); }
+    for (const line of Object.values(leaders)) line.visible = false;
     // front is +Y (away from the crank): a wheel rolling forward turns its top toward +Y, i.e. negative about X
     const c = -rad(st.caseA), d = -rad(st.delta);
     for (const n of CASE) meshes[n].matrix.makeRotationX(c);
@@ -405,26 +447,35 @@ footer { color: var(--muted); font-size: 0.75rem; }
     $("panel-run").hidden = mode !== "run";
     if (mode === "run") { st.playing = false; setPlayLabel(); setXray(true); showMeters(); }
     else { setXray(false); }
+    homeView();
   }
-  function setPlayLabel() { $("play").textContent = st.playing ? "❚❚ 暫停" : (st.t >= TOTAL ? "↺ 重播" : "▶ 播放"); }
-  function play(until) {
-    if (st.t >= TOTAL - 1e-6) st.t = 0;
-    st.stopAt = until ?? TOTAL; st.playing = true; setPlayLabel();
+  function setPlayLabel() {
+    const label = st.playing ? "❚❚ 暫停" : (st.t >= N - 1e-6 ? "↺ 重播" : "▶ 自動播放");
+    if ($("play").textContent !== label) $("play").textContent = label;
   }
-  function gotoStep(k) {
-    k = Math.max(0, Math.min(STEPS.length - 1, k));
-    st.t = k * STEP_T; play((k + 1) * STEP_T - 1e-3);
+  // one step forward / back; repeated presses queue up from the step already being headed for
+  function stepBy(dir) {
+    st.playing = false;
+    if (dir > 0) st.target = Math.min(N, (st.target > st.t ? st.target : Math.floor(st.t + 1e-6)) + 1);
+    else st.target = Math.max(0, (st.target < st.t ? st.target : Math.ceil(st.t - 1e-6)) - 1);
   }
-  const curStep = () => Math.min(STEPS.length - 1, Math.floor(st.t / STEP_T + 1e-6));
+  function togglePlay() {
+    if (st.playing) { st.playing = false; return; }
+    if (st.t >= N - 1e-6) st.t = st.target = 0;   // replay from the exploded view
+    st.target = Math.max(st.target, Math.ceil(st.t - 1e-6));   // a step being taken apart goes back on
+    st.playing = true; st.wait = HOLD;
+  }
 
   $("tab-asm").addEventListener("click", () => setMode("asm"));
-  $("tab-run").addEventListener("click", () => { st.t = TOTAL; setMode("run"); });
-  $("play").addEventListener("click", () => { if (st.playing) { st.playing = false; setPlayLabel(); } else play(); });
-  $("prev").addEventListener("click", () => gotoStep(curStep() - (st.t - curStep() * STEP_T < 0.3 ? 1 : 0)));
-  $("next").addEventListener("click", () => gotoStep(curStep() + 1));
-  $("scrub").addEventListener("input", (e) => { st.playing = false; setPlayLabel(); st.t = (Number(e.target.value) / 1000) * TOTAL; });
+  $("tab-run").addEventListener("click", () => { st.t = st.target = N; st.playing = false; setMode("run"); });
+  $("play").addEventListener("click", togglePlay);
+  $("prev").addEventListener("click", () => stepBy(-1));
+  $("next").addEventListener("click", () => stepBy(1));
+  $("explode").addEventListener("click", () => { st.playing = false; st.target = 0; });
+  $("assemble").addEventListener("click", () => { st.playing = false; st.target = N; });
+  $("scrub").addEventListener("input", (e) => { st.playing = false; st.t = st.target = (Number(e.target.value) / 1000) * N; });
   $("xray").addEventListener("click", () => setXray(!st.xray));
-  $("resetview").addEventListener("click", () => { camera.position.copy(HOME_POS); controls.target.copy(HOME_TARGET); });
+  $("resetview").addEventListener("click", homeView);
   $("runplay").addEventListener("click", () => { st.running = !st.running; $("runplay").textContent = st.running ? "❚❚ 暫停" : "▶ 繼續"; });
   $("speed").addEventListener("input", (e) => (st.speed = Number(e.target.value)));
   document.querySelectorAll(".scen").forEach((b) => b.addEventListener("click", () => {
@@ -432,9 +483,9 @@ footer { color: var(--muted); font-size: 0.75rem; }
     st.scen = b.dataset.s; showMeters();
   }));
   window.addEventListener("keydown", (e) => {
-    if (e.target.closest("input")) return;
-    if (st.mode === "asm" && e.key === "ArrowRight") { gotoStep(curStep() + 1); e.preventDefault(); }
-    if (st.mode === "asm" && e.key === "ArrowLeft") { gotoStep(curStep() - 1); e.preventDefault(); }
+    if (e.target.closest?.("input")) return;
+    if (st.mode === "asm" && e.key === "ArrowRight") { stepBy(1); e.preventDefault(); }
+    if (st.mode === "asm" && e.key === "ArrowLeft") { stepBy(-1); e.preventDefault(); }
     if (e.key === " ") { (st.mode === "asm" ? $("play") : $("runplay")).click(); e.preventDefault(); }
   });
 
@@ -452,9 +503,13 @@ footer { color: var(--muted); font-size: 0.75rem; }
     // the first rAF timestamp can precede the performance.now() taken at start-up
     const dt = Math.max(0, Math.min(0.05, (now - last) / 1000)); last = now;
     if (st.mode === "asm") {
-      if (st.playing) {
-        st.t = reduced ? Math.min(st.stopAt, Math.ceil((st.t + 1e-3) / STEP_T) * STEP_T) : st.t + dt;
-        if (st.t >= st.stopAt) { st.t = Math.min(st.stopAt, TOTAL); st.playing = false; setPlayLabel(); }
+      if (st.t !== st.target) {
+        const dir = Math.sign(st.target - st.t);
+        st.t = reduced ? st.target : st.t + (dir * dt) / MOVE;
+        if ((st.t - st.target) * dir >= 0) { st.t = st.target; st.wait = 0; }
+      } else if (st.playing) {
+        if (st.t >= N) st.playing = false;
+        else if ((st.wait += dt) >= HOLD) st.target = Math.min(N, Math.floor(st.t + 1e-6) + 1);
       }
       poseAssembly();
     } else {
@@ -466,9 +521,9 @@ footer { color: var(--muted); font-size: 0.75rem; }
     requestAnimationFrame(frame);
   }
   setXray(false);
+  homeView();
   resize();
-  play();
-  requestAnimationFrame(frame);
+  requestAnimationFrame(frame);   // opens on the exploded view and waits for the viewer to step
 })();
 </script>
 
