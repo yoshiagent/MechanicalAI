@@ -57,5 +57,16 @@ a.card:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
 .go { font-size: 0.88rem; color: var(--blue-soft); font-weight: 600; }
 .card.soon { opacity: 0.6; }
 .card.soon .go { color: var(--muted); font-weight: 400; }
+/* category pages */
+.cat-hero { display: grid; grid-template-columns: 96px 1fr; gap: 20px; align-items: center; }
+.cat-icon { background: var(--deep); border: 1px solid var(--line); border-radius: 16px; padding: 10px; aspect-ratio: 1; }
+.cat-icon svg { width: 100%; height: 100%; display: block; }
+@media (max-width: 520px) { .cat-hero { grid-template-columns: 64px 1fr; gap: 14px; } }
+.sec { margin: 0 0 12px; font-size: 1.15rem; }
+.kinds { margin: 0; padding: 14px 18px 14px 2.3em; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; display: grid; gap: 8px; font-size: 0.95rem; }
+.kinds li::marker { color: var(--orange); }
+.kinds .en { color: var(--muted); font-size: 0.85em; }
+.callout { margin: 0; background: var(--callout-bg); border: 1px solid var(--callout-line); color: var(--blue-soft); border-radius: 12px; padding: 12px 16px; font-size: 0.95rem; }
+.callout strong { color: var(--fg); }
 footer { color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--line); padding-top: 16px; }
 @media (prefers-reduced-motion: reduce) { .card { transition: none; } a.card:hover { transform: none; } }

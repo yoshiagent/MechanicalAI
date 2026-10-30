@@ -14,40 +14,62 @@
   <header class="hero">
     <span class="eyebrow">Mechanisms</span>
     <h1>機構學</h1>
-    <p class="lead">把傳動機構做成可以 3D 列印、親手轉動的模型，再用動畫拆解它的組裝順序與運作原理。</p>
+    <p class="lead">依運動傳遞方式分成五大類。每一類介紹常見種類與應用，並把機構做成可以 3D 列印、親手轉動的模型，用動畫拆解組裝順序與運作原理。</p>
   </header>
 
-  <section class="grid" aria-label="機構模型">
-    <a class="card" href="differential/">
-      <div class="media"><img src="differential/thumb.jpg" width="960" height="600" alt="傘齒輪差速器組合模型：底座、大齒輪、曲柄與兩個輪子"></div>
+  <section class="grid" aria-label="機構分類">
+    <a class="card" href="linkage/">
+      <div class="media" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M8 88 H92" stroke="#94a3b8" stroke-width="3"/><path d="M22 78 L14 88 H30 Z M80 78 L72 88 H88 Z" fill="#131f2e" stroke="#94a3b8" stroke-width="3" stroke-linejoin="round"/><path d="M22 78 L30 46 L72 26 L80 78" fill="none" stroke="#fb923c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22" cy="78" r="4.5" fill="#07111e" stroke="#fde68a" stroke-width="2.5"/><circle cx="30" cy="46" r="4.5" fill="#07111e" stroke="#fde68a" stroke-width="2.5"/><circle cx="72" cy="26" r="4.5" fill="#07111e" stroke="#fde68a" stroke-width="2.5"/><circle cx="80" cy="78" r="4.5" fill="#07111e" stroke="#fde68a" stroke-width="2.5"/></svg></div>
       <div class="body">
-        <h2>差速器<span class="en">Differential</span></h2>
-        <ul>
-          <li>爆炸圖 + 12 步組裝，可逐步前進／後退</li>
-          <li>4 種運轉情境：直行、轉彎、單輪卡住、殼固定</li>
-          <li>減速比 <strong>3 : 1</strong>，殼轉速 = 兩輪平均</li>
-        </ul>
-        <div class="meta"><span class="tag">傘齒輪 Bevel Gear</span><span class="tag">LEGO 十字軸</span><span class="tag">3D 列印</span></div>
-        <span class="go">開啟動畫 →</span>
+        <h2>連桿<span class="en">Linkages</span></h2>
+        <ul><li>四連桿、曲柄滑塊、平行四邊形連桿</li><li>旋轉 ↔ 擺動 ↔ 直線往復</li></ul>
+        <div class="meta"><span class="tag">模型規劃中</span></div>
+        <span class="go">進入連桿 →</span>
       </div>
     </a>
 
-    <a class="card" href="differential/freecad/">
-      <div class="media"><img src="differential/freecad/crank.jpg" width="960" height="600" alt="差速器曲柄零件：LEGO 十字孔輪轂、曲柄臂與握把"></div>
+    <a class="card" href="cam/">
+      <div class="media" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M38 12 H46 M54 12 H62 M38 22 H46 M54 22 H62" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/><path d="M50 6 V34" stroke="#94a3b8" stroke-width="7" stroke-linecap="round"/><path d="M50 42 C64 42 70 60 69 70 C68 82 60 90 50 90 C39 90 31 82 31 72 C31 58 38 42 50 42 Z" fill="#4ade80"/><circle cx="50" cy="71" r="5" fill="#07111e"/><circle cx="50" cy="35" r="7" fill="#07111e" stroke="#fb923c" stroke-width="4"/></svg></div>
       <div class="body">
-        <h2>差速器 CAD 與列印檔案<span class="en">CAD Files</span></h2>
-        <ul>
-          <li>FreeCAD：參數化曲柄零件圖 + 組合圖</li>
-          <li>STEP：組合與曲柄，任何 CAD 軟體都能開</li>
-          <li>3MF：Bambu Studio 專案，已排好盤可直接列印</li>
-        </ul>
-        <div class="meta"><span class="tag">FCStd</span><span class="tag">STEP</span><span class="tag">3MF</span></div>
-        <span class="go">下載檔案 →</span>
+        <h2>凸輪<span class="en">Cams</span></h2>
+        <ul><li>盤形凸輪、圓柱凸輪</li><li>滾子／平面從動件與位移曲線</li></ul>
+        <div class="meta"><span class="tag">模型規劃中</span></div>
+        <span class="go">進入凸輪 →</span>
+      </div>
+    </a>
+
+    <a class="card" href="gear/">
+      <div class="media" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="#eab308"><circle cx="40" cy="60" r="22"/><rect x="36.5" y="29.0" width="7" height="12.0" rx="1.5" transform="rotate(0.0 40 60)"/><rect x="36.5" y="29.0" width="7" height="12.0" rx="1.5" transform="rotate(36.0 40 60)"/><rect x="36.5" y="29.0" width="7" height="12.0" rx="1.5" transform="rotate(72.0 40 60)"/><rect x="36.5" y="29.0" width="7" height="12.0" rx="1.5" transform="rotate(108.0 40 60)"/><rect x="36.5" y="29.0" width="7" height="12.0" rx="1.5" transform="rotate(144.0 40 60)"/><rect x="36.5" y="29.0" width="7" height="12.0" rx="1.5" transform="rotate(180.0 40 60)"/><rect x="36.5" y="29.0" width="7" height="12.0" rx="1.5" transform="rotate(216.0 40 60)"/><rect x="36.5" y="29.0" width="7" height="12.0" rx="1.5" transform="rotate(252.0 40 60)"/><rect x="36.5" y="29.0" width="7" height="12.0" rx="1.5" transform="rotate(288.0 40 60)"/><rect x="36.5" y="29.0" width="7" height="12.0" rx="1.5" transform="rotate(324.0 40 60)"/></g><circle cx="40" cy="60" r="7.0" fill="#07111e"/><g fill="#fb923c"><circle cx="75" cy="28" r="11"/><rect x="72.0" y="9.0" width="6" height="11.0" rx="1.5" transform="rotate(30.0 75 28)"/><rect x="72.0" y="9.0" width="6" height="11.0" rx="1.5" transform="rotate(90.0 75 28)"/><rect x="72.0" y="9.0" width="6" height="11.0" rx="1.5" transform="rotate(150.0 75 28)"/><rect x="72.0" y="9.0" width="6" height="11.0" rx="1.5" transform="rotate(210.0 75 28)"/><rect x="72.0" y="9.0" width="6" height="11.0" rx="1.5" transform="rotate(270.0 75 28)"/><rect x="72.0" y="9.0" width="6" height="11.0" rx="1.5" transform="rotate(330.0 75 28)"/></g><circle cx="75" cy="28" r="3.5" fill="#07111e"/></svg></div>
+      <div class="body">
+        <h2>齒輪<span class="en">Gears</span></h2>
+        <ul><li>正齒輪、傘齒輪、蝸桿、行星齒輪</li><li>模型：傘齒輪差速器</li></ul>
+        <div class="meta"><span class="tag">差速器</span><span class="tag">1 個模型</span></div>
+        <span class="go">進入齒輪 →</span>
+      </div>
+    </a>
+
+    <a class="card" href="intermittent/">
+      <div class="media" aria-hidden="true"><svg viewBox="0 0 100 100"><circle cx="38" cy="58" r="26" fill="#a78bfa"/><circle cx="64.2" cy="84.2" r="15" fill="#07111e"/><circle cx="11.8" cy="84.2" r="15" fill="#07111e"/><circle cx="11.8" cy="31.8" r="15" fill="#07111e"/><circle cx="64.2" cy="31.8" r="15" fill="#07111e"/><rect x="49" y="54.5" width="17" height="7" rx="3" fill="#07111e" transform="rotate(0 38 58)"/><rect x="49" y="54.5" width="17" height="7" rx="3" fill="#07111e" transform="rotate(90 38 58)"/><rect x="49" y="54.5" width="17" height="7" rx="3" fill="#07111e" transform="rotate(180 38 58)"/><rect x="49" y="54.5" width="17" height="7" rx="3" fill="#07111e" transform="rotate(270 38 58)"/><circle cx="38" cy="58" r="5" fill="#07111e"/><circle cx="80" cy="58" r="10" fill="none" stroke="#94a3b8" stroke-width="4"/><path d="M80 58 L57 58" stroke="#fb923c" stroke-width="6" stroke-linecap="round"/><circle cx="57" cy="58" r="4.5" fill="#fb923c"/><circle cx="80" cy="58" r="3.5" fill="#fb923c"/></svg></div>
+      <div class="body">
+        <h2>間歇運動<span class="en">Intermittent Motion</span></h2>
+        <ul><li>日內瓦機構、棘輪、間歇齒輪</li><li>連續轉動 → 分段轉動</li></ul>
+        <div class="meta"><span class="tag">模型規劃中</span></div>
+        <span class="go">進入間歇運動 →</span>
+      </div>
+    </a>
+
+    <a class="card" href="flexible/">
+      <div class="media" aria-hidden="true"><svg viewBox="0 0 100 100"><circle cx="30" cy="55" r="19" fill="#2d3f55" stroke="#94a3b8" stroke-width="3"/><circle cx="76" cy="55" r="9" fill="#2d3f55" stroke="#94a3b8" stroke-width="3"/><path d="M34.8 33.5 L78.6 43.3 A12 12 0 0 1 78.6 66.7 L34.8 76.5 A22 22 0 1 1 34.8 33.5 Z" fill="none" stroke="#3b82f6" stroke-width="5" stroke-linejoin="round" stroke-dasharray="7 3"/><circle cx="30" cy="55" r="5" fill="#07111e"/><circle cx="76" cy="55" r="3.5" fill="#07111e"/></svg></div>
+      <div class="body">
+        <h2>撓性運動<span class="en">Flexible Drives</span></h2>
+        <ul><li>皮帶、時規皮帶、鏈條、繩索</li><li>長距離傳動、可吸收衝擊</li></ul>
+        <div class="meta"><span class="tag">模型規劃中</span></div>
+        <span class="go">進入撓性運動 →</span>
       </div>
     </a>
   </section>
 
-  <footer>模型以 text-to-cad（OpenCascade）建模、FreeCAD 參數化曲柄；齒輪咬合經干涉與轉動模擬檢查</footer>
+  <footer>模型以 text-to-cad（OpenCascade）建模、FreeCAD 參數化；齒輪咬合經干涉與轉動模擬檢查</footer>
 </main>
 </body>
 </html>
