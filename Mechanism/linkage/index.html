@@ -23,7 +23,7 @@
   <section>
     <h2 class="sec">常見種類</h2>
     <ul class="kinds">
-      <li><strong>四連桿機構</strong><span class="en">（Four-Bar Linkage）</span>：四根桿以銷接成封閉迴路；改變桿長可得曲柄搖桿、雙曲柄、雙搖桿</li>
+      <li><strong>四連桿機構</strong><span class="en">（Four-Bar Linkage）</span>：四根桿以銷接成封閉迴路；改變桿長可得曲柄搖桿、雙曲柄、雙搖桿；<a href="../fourbar/">長度限制與運動種類 →</a></li>
       <li><strong>曲柄滑塊機構</strong><span class="en">（Slider-Crank）</span>：旋轉與直線往復互換，引擎活塞、空壓機的核心</li>
       <li><strong>平行四邊形連桿</strong><span class="en">（Parallelogram Linkage）</span>：對邊等長，輸出桿始終保持平行，例如檯燈臂、火車動輪連桿</li>
       <li><strong>肘節機構</strong><span class="en">（Toggle Mechanism）</span>：接近死點時用小力產生很大的力，例如衝床、快速夾鉗</li>
@@ -31,7 +31,7 @@
     </ul>
   </section>
 
-  <p class="callout"><strong>葛拉索夫條件（Grashof Condition）</strong>：最短桿 + 最長桿 ≤ 另外兩桿之和，才有桿件能轉整圈。</p>
+  <p class="callout"><strong>葛拉索夫條件（Grashof Condition）</strong>：最短桿 + 最長桿 ≤ 另外兩桿之和，才有桿件能轉整圈；再看最短桿在哪個位置，就知道輸入軸、輸出軸各是轉整圈還是擺動。<a href="../fourbar/">四連桿長度限制與運動種類分析 →</a></p>
 
   <section>
     <h2 class="sec">生活中的應用</h2>
@@ -41,6 +41,20 @@
   <section>
     <h2 class="sec">模型</h2>
     <div class="grid">
+    <a class="card" href="../fourbar/">
+      <div class="media" aria-hidden="true"><svg viewBox="0 0 100 100"><circle cx="24" cy="66" r="12" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-dasharray="4 3"/><path d="M60 30 A26 26 0 0 1 86 50" fill="none" stroke="#fb923c" stroke-width="2.5" stroke-dasharray="4 3"/><path d="M10 80 H92" stroke="#94a3b8" stroke-width="3"/><path d="M24 66 L33 58 L70 36 L76 66" fill="none" stroke="#fde68a" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M24 66 L33 58" stroke="#3b82f6" stroke-width="6" stroke-linecap="round"/><path d="M76 66 L70 36" stroke="#fb923c" stroke-width="6" stroke-linecap="round"/><path d="M24 66 L76 66" stroke="#94a3b8" stroke-width="2.5" stroke-dasharray="5 4"/><circle cx="24" cy="66" r="4" fill="#07111e" stroke="#e2e8f0" stroke-width="2"/><circle cx="76" cy="66" r="4" fill="#07111e" stroke="#e2e8f0" stroke-width="2"/><circle cx="33" cy="58" r="3.5" fill="#07111e" stroke="#e2e8f0" stroke-width="2"/><circle cx="70" cy="36" r="3.5" fill="#07111e" stroke="#e2e8f0" stroke-width="2"/></svg></div>
+      <div class="body">
+        <h2>四連桿：長度限制與運動種類<span class="en">Four-Bar Analysis</span></h2>
+        <ul>
+          <li>組成條件與葛拉索夫條件：<strong>s + l ≤ p + q</strong></li>
+          <li>依輸入軸、輸出軸的運動分六種：曲柄搖桿、雙曲柄、搖桿曲柄、雙搖桿、變點、三搖桿</li>
+          <li>Freudenstein 方程式、傳力角、急回比；互動模擬可調四根桿長</li>
+        </ul>
+        <div class="meta"><span class="tag">Grashof</span><span class="tag">運動倒置</span><span class="tag">互動模擬</span></div>
+        <span class="go">閱讀分析 →</span>
+      </div>
+    </a>
+
     <a class="card" href="../ackermann/">
       <div class="media"><img src="../ackermann/thumb.jpg" width="960" height="600" alt="MG90S 前輪轉向打到底的俯視圖：曲柄推動兩支拉桿，內輪轉得比外輪多"></div>
       <div class="body">

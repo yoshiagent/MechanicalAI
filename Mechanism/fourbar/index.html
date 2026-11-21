@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>四連桿長度限制與運動種類 · MechanicalAI</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<style>
+/* Page layout: theory sections, a grid of type cards (diagram + input/output curve), an interactive simulator. */
+section { display: grid; gap: 12px; }
+main.wrap > *, section > *, .prose > li, .sim > * { min-width: 0; }   /* let wide formula boxes scroll instead of widening the page */
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+.prose { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.prose li::marker { color: var(--blue); }
+.formula { background: var(--deep); border: 1px solid rgba(59,130,246,.35); color: #7dd3fc; border-radius: 10px;
+  padding: 10px 14px; font-family: var(--mono); font-size: .92rem; overflow-x: auto; white-space: pre; margin: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+figure { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+figure svg { display: block; width: 100%; height: auto; }
+figcaption { color: var(--muted); font-size: .86rem; margin-top: 6px; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+th { background: var(--deep); color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+td.y { color: #86efac; } td.n { color: #fca5a5; }
+.types { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 470px), 1fr)); gap: 16px; }
+.type { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; align-content: start; }
+.type h3 { margin: 0; font-size: 1.05rem; }
+.type h3 .en { color: var(--muted); font-weight: 400; font-size: .82rem; margin-left: 6px; }
+.type .pics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.type .pics svg { width: 100%; height: auto; background: var(--deep); border: 1px solid var(--line); border-radius: 8px; display: block; }
+.type ul { margin: 0; padding-left: 1.2em; font-size: .9rem; }
+.type li::marker { color: var(--orange); }
+.lens { font-family: var(--mono); font-size: .8rem; color: var(--muted); }
+.io { display: flex; flex-wrap: wrap; gap: 6px; }
+.io span { font-size: .78rem; border-radius: 999px; padding: 1px 10px; border: 1px solid var(--line); }
+.io .in { color: #93c5fd; border-color: rgba(59,130,246,.4); background: #0f2040; }
+.io .out { color: #fdba74; border-color: rgba(251,146,60,.4); background: #2a1708; }
+/* simulator */
+.sim { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .sim { grid-template-columns: 1fr; } }
+.sim svg { width: 100%; height: auto; background: var(--deep); border: 1px solid var(--line); border-radius: 10px; display: block; }
+.ctrl { display: grid; gap: 10px; }
+.slider { display: grid; grid-template-columns: 7.5em 1fr 3.2em; gap: 8px; align-items: center; font-size: .9rem; }
+.slider input { width: 100%; accent-color: var(--blue); }
+.slider output { font-family: var(--mono); text-align: right; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn { border: 1px solid var(--line); background: var(--deep); color: var(--fg); border-radius: 8px; padding: 5px 10px; font: inherit; font-size: .85rem; cursor: pointer; }
+.btn:hover { border-color: var(--blue); }
+.btn[aria-pressed="true"] { border-color: var(--orange); color: #fdba74; }
+.btn:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.verdict { border-radius: 10px; padding: 10px 14px; background: #0f2040; border: 1px solid rgba(59,130,246,.3); }
+.verdict b { font-size: 1.1rem; }
+.verdict .sub { color: var(--muted); font-size: .86rem; }
+.readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.readout div { background: var(--deep); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; min-width: 0; }
+.readout b { display: block; color: var(--muted); font-size: .75rem; font-weight: 600; }
+.readout output { font-family: var(--mono); font-size: 1rem; font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) { .readout { grid-template-columns: repeat(2, minmax(0, 1fr)); } .type .pics { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <nav class="crumbs" aria-label="導覽"><a href="../../">MechanicalAI</a><span>/</span><a href="../">機構學</a><span>/</span><a href="../linkage/">連桿</a><span>/</span><span>四連桿分析</span></nav>
+
+  <header class="hero">
+    <span class="eyebrow">Four-Bar Linkage</span>
+    <h1>四連桿：長度限制與運動種類</h1>
+    <p class="lead">四根桿長決定了機構能不能組起來、哪一根桿能轉整圈，以及輸入軸轉動時輸出軸怎麼動。本頁從輸入軸與輸出軸的運動關係，把四連桿分成六種，並附可調桿長的互動模擬。</p>
+  </header>
+
+  <section>
+    <h2 class="sec">1. 名稱與符號</h2>
+    <div class="two">
+      <figure><svg id="fig-names" viewBox="0 0 440 260" role="img" aria-label="四連桿各桿名稱：機架 d、輸入桿 a、連結桿 b、輸出桿 c"></svg>
+        <figcaption>圖 1　輸入軸 O₂、輸出軸 O₄ 固定在機架上；θ 是輸入桿角、φ 是輸出桿角，μ 是傳力角。</figcaption></figure>
+      <ul class="prose">
+        <li><strong>機架 d</strong>（Ground / Frame）：固定不動，兩端是輸入軸 O₂ 與輸出軸 O₄</li>
+        <li><strong>輸入桿 a</strong>（Input / Driver）：接馬達或手柄，轉角 θ</li>
+        <li><strong>連結桿 b</strong>（Coupler）：不接機架，把運動從輸入傳到輸出</li>
+        <li><strong>輸出桿 c</strong>（Output / Follower）：轉角 φ，是我們要的運動</li>
+        <li>把四根桿長由小到大排成 <strong>s ≤ p ≤ q ≤ l</strong>：s 最短、l 最長，p、q 是另外兩根</li>
+        <li>能「轉整圈」的桿稱<strong>曲柄（Crank）</strong>，只能來回擺的稱<strong>搖桿（Rocker）</strong></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">2. 長度限制</h2>
+    <ol class="prose">
+      <li><strong>能組成封閉迴路</strong>：最長桿必須小於另外三根之和
+        <div class="formula">l &lt; s + p + q          （l = s + p + q 時四根桿拉成一直線，完全不能動）</div></li>
+      <li><strong>葛拉索夫條件（Grashof Condition）</strong>：決定有沒有桿能轉整圈
+        <div class="formula">s + l &lt; p + q   → 葛拉索夫機構：至少一根桿能相對其他桿轉整圈
+s + l = p + q   → 變點機構（Change Point）：能轉整圈，但會經過四桿共線的「攤平」位置
+s + l &gt; p + q   → 非葛拉索夫：沒有任何一根桿能轉整圈，四根桿都只能擺動</div></li>
+    </ol>
+    <div class="panel">
+      <b>為什麼是 s + l ≤ p + q？</b>以輸入桿 a 要轉整圈為例：
+      <ul class="prose" style="margin-top:6px">
+        <li>輸入桿轉到和機架<strong>重疊</strong>（θ = 0°）與<strong>拉直</strong>（θ = 180°）兩個位置時，O₂、A、O₄ 共線，A 到 O₄ 的距離分別是 |d − a| 與 d + a</li>
+        <li>這兩個位置都必須能和連結桿、輸出桿組成三角形（含退化）：
+          <div class="formula">d + a ≤ b + c          （拉直時夠得到）
+|d − a| ≥ |b − c|      （重疊時不會太短）</div></li>
+        <li>把四種正負號組合整理後，等價於「<strong>a 是最短桿，且 s + l ≤ p + q</strong>」。同理可推得其他桿轉整圈的條件，所以葛拉索夫條件加上「誰最短」就決定了運動種類</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">3. 運動種類：看輸入軸與輸出軸怎麼動</h2>
+    <p style="margin:0">葛拉索夫機構中，<strong>最短桿放在哪個位置</strong>決定種類。下面前四種其實是<strong>同一組桿長 2、4、5、4.5</strong>，只是固定不同的桿當機架，這稱為<strong>運動倒置（Kinematic Inversion）</strong>。</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>條件</th><th>最短桿位置</th><th>種類</th><th>輸入軸 O₂</th><th>輸出軸 O₄</th><th>例子</th></tr></thead>
+      <tbody>
+        <tr><td>s + l &lt; p + q</td><td>輸入桿 a</td><td>曲柄搖桿</td><td class="y">轉整圈</td><td class="n">擺動</td><td>雨刷、縫紉機踏板（反用）、碎石機</td></tr>
+        <tr><td>s + l &lt; p + q</td><td>機架 d</td><td>雙曲柄</td><td class="y">轉整圈</td><td class="y">轉整圈（不等速）</td><td>拖曳連桿、振動篩</td></tr>
+        <tr><td>s + l &lt; p + q</td><td>輸出桿 c</td><td>搖桿曲柄</td><td class="n">擺動</td><td class="y">轉整圈</td><td>腳踏縫紉機、腳踩陀螺</td></tr>
+        <tr><td>s + l &lt; p + q</td><td>連結桿 b</td><td>雙搖桿（葛拉索夫）</td><td class="n">擺動</td><td class="n">擺動</td><td>（連結桿可轉整圈）</td></tr>
+        <tr><td>s + l = p + q</td><td>—</td><td>變點機構</td><td class="y">轉整圈</td><td>轉整圈或擺動，經過共線點會分岔</td><td>平行四邊形連桿、火車動輪</td></tr>
+        <tr><td>s + l &gt; p + q</td><td>任何位置</td><td>三搖桿（非葛拉索夫）</td><td class="n">擺動</td><td class="n">擺動</td><td>阿克曼轉向每一側、汽車懸吊</td></tr>
+      </tbody>
+    </table></div>
+    <div class="types" id="types"></div>
+    <p class="callout">每張卡片左邊是機構圖（藍色是輸入桿可到達的範圍、橘色是輸出桿的範圍），右邊是<strong>輸出角 φ 對輸入角 θ</strong>：實線是開口組態（Open），虛線是交叉組態（Crossed）。同一組 θ 可以有兩個 φ，就是四連桿的兩種裝配方式。</p>
+  </section>
+
+  <section>
+    <h2 class="sec">4. 輸入與輸出的數學關係</h2>
+    <ul class="prose">
+      <li><strong>位置：Freudenstein 方程式</strong>：把迴路向量 a + b = d + c 的 b 消去，直接得到 θ 與 φ 的關係</li>
+    </ul>
+    <div class="formula">K₁ cos φ − K₂ cos θ + K₃ = cos(θ − φ)
+
+K₁ = d / a     K₂ = d / c     K₃ = (a² − b² + c² + d²) / (2ac)
+
+解：A = cos θ − K₁ − K₂ cos θ + K₃     B = −2 sin θ     C = K₁ − (K₂ + 1) cos θ + K₃
+    φ = 2 atan[ (−B ± √(B² − 4AC)) / (2A) ]      （取 − 號是開口組態、+ 號是交叉組態）</div>
+    <ul class="prose">
+      <li><strong>B² − 4AC &lt; 0</strong> 時無解：這個 θ 組不起來，輸入桿只能在有解的範圍內擺動；B² − 4AC = 0 是擺動的端點（連結桿和輸出桿共線）</li>
+      <li><strong>速度比</strong>：對 θ 微分得輸出角速度
+        <div class="formula">ω₄ / ω₂ = a · sin(θ₃ − θ) / [ c · sin(θ₃ − φ) ]      （θ₃：連結桿角度）</div>
+        雙曲柄的兩軸都轉整圈，但這個比值一直在變，所以是「不等速」傳動</li>
+      <li><strong>傳力角 μ</strong>（Transmission Angle）：連結桿與輸出桿的夾角
+        <div class="formula">cos μ = [ b² + c² − (a² + d² − 2ad cos θ) ] / (2bc)</div>
+        μ 越接近 90° 傳力越好；一般要求 μ ≥ 40°。最小值出現在 θ = 0° 或 180°（輸入桿與機架共線時）</li>
+      <li><strong>急回比 Q</strong>（Quick-Return Ratio，曲柄搖桿）：輸出桿往返兩個極限位置時，曲柄轉過的角度不同
+        <div class="formula">Q = (180° + α) / (180° − α)      α：兩個極限位置的曲柄角差減 180°</div>
+        Q &gt; 1 表示回程比去程快，常用在牛頭刨床、送料機構</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="sec">5. 互動模擬：調桿長，看種類與運動</h2>
+    <div class="sim">
+      <div style="display:grid; gap:10px">
+        <svg id="sim-mech" viewBox="0 0 520 340" role="img" aria-label="四連桿機構動畫"></svg>
+        <svg id="sim-chart" viewBox="0 0 520 250" role="img" aria-label="輸出角對輸入角曲線"></svg>
+      </div>
+      <div class="ctrl">
+        <div class="presets" id="presets" aria-label="範例"></div>
+        <div class="slider"><label for="s-a">輸入桿 a</label><input id="s-a" type="range" min="1" max="10" step="0.1"><output id="o-a"></output></div>
+        <div class="slider"><label for="s-b">連結桿 b</label><input id="s-b" type="range" min="1" max="10" step="0.1"><output id="o-b"></output></div>
+        <div class="slider"><label for="s-c">輸出桿 c</label><input id="s-c" type="range" min="1" max="10" step="0.1"><output id="o-c"></output></div>
+        <div class="slider"><label for="s-d">機架 d</label><input id="s-d" type="range" min="1" max="10" step="0.1"><output id="o-d"></output></div>
+        <div class="verdict" id="verdict" aria-live="polite"></div>
+        <div class="readout">
+          <div><b>輸入角 θ</b><output id="r-th">—</output></div>
+          <div><b>輸出角 φ</b><output id="r-ph">—</output></div>
+          <div><b>傳力角 μ</b><output id="r-mu">—</output></div>
+          <div><b>速度比 ω₄/ω₂</b><output id="r-w">—</output></div>
+          <div><b>輸出擺角</b><output id="r-sw">—</output></div>
+          <div><b>急回比 Q</b><output id="r-q">—</output></div>
+        </div>
+        <div class="presets"><button class="btn" id="play" aria-pressed="true">暫停</button><button class="btn" id="branch">切換組態（開口／交叉）</button></div>
+        <p style="margin:0; color: var(--muted); font-size: .85rem">輸入桿不能轉整圈時，模擬會在可動範圍內來回擺動；到端點時機構自然換到另一個組態，輸出桿繼續往同一方向走。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">6. 應用：阿克曼轉向的每一側是三搖桿</h2>
+    <ul class="prose">
+      <li>MG90S 前輪轉向的每一側：機架 = 伺服軸到主銷 <strong>56.57</strong>、輸入曲柄 <strong>28.16</strong>、拉桿 <strong>26.45</strong>、轉向臂 <strong>18</strong></li>
+      <li>s + l = 18 + 56.57 = <strong>74.57</strong> &gt; p + q = 26.45 + 28.16 = <strong>54.61</strong> → <strong>非葛拉索夫三搖桿</strong>：伺服與輪子都只擺動，正好符合轉向只需 ±17.5° 輸入、±32° 輸出的需求</li>
+      <li>它只在遠離共線端點的一小段範圍工作，所以傳力角維持在 37° 以上；詳細分析見 <a href="../ackermann/" style="color:var(--blue-soft)">阿克曼轉向機構理論分析</a></li>
+    </ul>
+  </section>
+
+  <footer>MechanicalAI · 機構學 / 連桿 / 四連桿分析 · 所有圖與數值由頁面內同一套四連桿求解程式即時計算</footer>
+</main>
+
+<script>
+(() => {
+  "use strict";
+  const D2R = Math.PI / 180, R2D = 180 / Math.PI;
+  const COL = { fg: "#e2e8f0", muted: "#94a3b8", line: "#2d3f55", grid: "#1c2a3c", deep: "#07111e",
+                blue: "#3b82f6", blue2: "#93c5fd", orange: "#fb923c", orange2: "#fdba74", green: "#4ade80",
+                yellow: "#fde68a", pink: "#f472b6" };
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+  const txt = (parent, x, y, s, fill, size = 12, anchor = "start", weight = 400) => {
+    const t = el("text", { x, y, fill, "font-size": size, "text-anchor": anchor, "font-weight": weight }, parent);
+    t.textContent = s;
+    return t;
+  };
+  const wrap = (x) => ((x + 540) % 360) - 180;   // angle into (-180, 180]
+
+  // ---------- four-bar solver: O2 = (0,0), O4 = (d,0); input a at angle th; coupler b; output c ----------
+  function solve(L, th, sigma) {
+    const { a, b, c, d } = L;
+    const ax = a * Math.cos(th), ay = a * Math.sin(th);
+    const dx = d - ax, dy = -ay, e = Math.hypot(dx, dy);
+    if (e > b + c + 1e-9 || e < Math.abs(b - c) - 1e-9 || e < 1e-12) return null;
+    const along = (b * b - c * c + e * e) / (2 * e);
+    const h = Math.sqrt(Math.max(b * b - along * along, 0));
+    const ux = dx / e, uy = dy / e;
+    const bx = ax + along * ux - sigma * h * uy, by = ay + along * uy + sigma * h * ux;
+    const phi = Math.atan2(by, bx - d), th3 = Math.atan2(by - ay, bx - ax);
+    const cosmu = (b * b + c * c - e * e) / (2 * b * c);
+    const mu = Math.acos(Math.max(-1, Math.min(1, cosmu))) * R2D;
+    const den = c * Math.sin(th3 - phi);
+    const w = Math.abs(den) < 1e-9 ? Infinity : a * Math.sin(th3 - th) / den;
+    return { A: [ax, ay], B: [bx, by], phi, th3, mu: Math.min(mu, 180 - mu), w };
+  }
+
+  // feasible input range: |A - O4| must lie in [|b - c|, b + c]
+  function inputRange(L) {
+    const { a, b, c, d } = L;
+    const cosOf = (e) => (a * a + d * d - e * e) / (2 * a * d);
+    const cmax = cosOf(Math.abs(b - c)), cmin = cosOf(b + c);   // cos(th) must be in [cmin, cmax]
+    if (cmax >= 1 - 1e-12 && cmin <= -1 + 1e-12) return { full: true, lo: 0, hi: 2 * Math.PI };
+    if (cmax >= 1 - 1e-12) { const t = Math.acos(Math.max(-1, cmin)); return { full: false, lo: -t, hi: t }; }
+    if (cmin <= -1 + 1e-12) { const t = Math.acos(Math.min(1, cmax)); return { full: false, lo: t, hi: 2 * Math.PI - t }; }
+    return { full: false, lo: Math.acos(cmax), hi: Math.acos(cmin), split: true };   // two separate arcs: show the upper one
+  }
+
+  function classify(L) {
+    const arr = [["a", L.a], ["b", L.b], ["c", L.c], ["d", L.d]].sort((x, y) => x[1] - y[1]);
+    const s = arr[0][1], p = arr[1][1], q = arr[2][1], l = arr[3][1];
+    const sl = s + l, pq = p + q, eps = 1e-6;
+    if (l >= s + p + q - eps) return { key: "none", name: "組不起來", en: "Cannot Assemble", sl, pq,
+      note: `最長桿 ${l.toFixed(1)} ≥ 其他三根之和 ${(s + p + q).toFixed(1)}` };
+    if (Math.abs(sl - pq) < eps) {
+      const par = Math.abs(L.a - L.c) < eps && Math.abs(L.b - L.d) < eps;
+      const kite = (Math.abs(L.a - L.d) < eps && Math.abs(L.b - L.c) < eps) || (Math.abs(L.a - L.b) < eps && Math.abs(L.c - L.d) < eps);
+      return { key: "change", name: par ? "變點機構（平行四邊形）" : kite ? "變點機構（箏形）" : "變點機構", en: "Change Point", sl, pq,
+        note: "s + l = p + q：能轉整圈，但會經過四桿共線的位置，在那裡可能換到另一種組態" };
+    }
+    if (sl > pq) return { key: "triple", name: "三搖桿（非葛拉索夫）", en: "Triple Rocker", sl, pq,
+      note: "s + l > p + q：沒有桿能轉整圈，輸入與輸出都只能擺動" };
+    const who = arr[0][0];
+    const T = { a: ["crank-rocker", "曲柄搖桿", "Crank-Rocker", "輸入桿最短：輸入轉整圈、輸出擺動"],
+                d: ["double-crank", "雙曲柄", "Double Crank", "機架最短：輸入、輸出都轉整圈"],
+                c: ["rocker-crank", "搖桿曲柄", "Rocker-Crank", "輸出桿最短：輸入擺動、輸出轉整圈"],
+                b: ["double-rocker", "雙搖桿（葛拉索夫）", "Grashof Double Rocker", "連結桿最短：輸入、輸出都擺動，連結桿轉整圈"] }[who];
+    return { key: T[0], name: T[1], en: T[2], sl, pq, note: T[3] };
+  }
+
+  // next pose by continuity: of the two assemblies, the one nearest where B was heading. Needed where the two
+  // branches touch (change-point mechanisms flatten out): a fixed open/crossed choice would jump there.
+  function follow(L, th, prev, prev2) {
+    const s1 = solve(L, th, 1), s2 = solve(L, th, -1);
+    if (!s1 || !s2 || !prev) return { s: s1 || s2, sigma: s1 ? 1 : -1 };
+    const px = prev2 ? 2 * prev.B[0] - prev2.B[0] : prev.B[0], py = prev2 ? 2 * prev.B[1] - prev2.B[1] : prev.B[1];
+    const d1 = Math.hypot(s1.B[0] - px, s1.B[1] - py), d2 = Math.hypot(s2.B[0] - px, s2.B[1] - py);
+    return d1 <= d2 ? { s: s1, sigma: 1 } : { s: s2, sigma: -1 };
+  }
+
+  // one full input turn followed by continuity, starting just past theta = 0 on the given branch
+  function fullTurn(L, sigma0, n = 721) {
+    const out = [];
+    let prev = null, prev2 = null;
+    for (let i = 0; i < n; i++) {
+      const th = (0.5 + 359 * i / (n - 1)) * D2R;
+      const f = prev ? follow(L, th, prev, prev2) : { s: solve(L, th, sigma0) };
+      if (!f.s) return out;
+      out.push({ th, ...f.s });
+      prev2 = prev; prev = f.s;
+    }
+    return out;
+  }
+
+  // the motion as it really runs: full input turn followed by continuity, or oscillation that swaps branch at each end
+  function trace(L, n = 361, sigma0 = 1) {
+    const r = inputRange(L);
+    let pts = [];
+    if (r.full) {
+      pts = fullTurn(L, sigma0, n);
+    } else {
+      for (const sg of [sigma0, -sigma0]) {
+        for (let i = 0; i < n; i++) {
+          const u = sg === sigma0 ? i / (n - 1) : 1 - i / (n - 1);
+          const th = r.lo + (r.hi - r.lo) * u;
+          const s = solve(L, th, sg); if (s) pts.push({ th, ...s });
+        }
+      }
+    }
+    return { range: r, pts };
+  }
+
+  function outputSwing(L, tr) {
+    // output full turn: |O2 - B| must cover [|d - c|, d + c] inside [|a - b|, a + b] (the mirror of the input test)
+    const { a, b, c, d } = L;
+    if (Math.abs(a - b) <= Math.abs(d - c) + 1e-9 && d + c <= a + b + 1e-9) return { full: true };
+    if (!tr.pts.length) return null;
+    const ref = tr.pts[0].phi;
+    let lo = 0, hi = 0;
+    for (const p of tr.pts) { const v = wrap((p.phi - ref) * R2D); lo = Math.min(lo, v); hi = Math.max(hi, v); }
+    return { full: false, swing: hi - lo, lo: wrap(ref * R2D + lo), hi: wrap(ref * R2D + hi) };
+  }
+
+  function quickReturn(L) {
+    // crank-rocker extremes: coupler and crank collinear (extended a + b, folded b - a)
+    const { a, b, c, d } = L;
+    const meet = (r0) => {   // circle (O2, r0) with circle (O4, c), upper point
+      const x = (r0 * r0 - c * c + d * d) / (2 * d), y2 = r0 * r0 - x * x;
+      return y2 < 0 ? null : [x, Math.sqrt(y2)];
+    };
+    const e1 = meet(a + b), e2 = meet(b - a);
+    if (!e1 || !e2) return null;
+    const t1 = Math.atan2(e1[1], e1[0]), t2 = Math.atan2(-e2[1], -e2[0]);
+    let diff = Math.abs(wrap((t1 - t2) * R2D));
+    const alpha = Math.abs(180 - diff);
+    return { Q: (180 + alpha) / (180 - alpha), alpha };
+  }
+
+  // ---------- drawing ----------
+  // fit the given points (vehicle-free plane coordinates, y up) into the box, keeping room for the ground symbols
+  function fitter(pts, pad, W, H) {
+    const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+    const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+    const span = Math.max(x1 - x0, y1 - y0, 1e-6);
+    const s = Math.min((W - 2 * pad) / Math.max(x1 - x0, span * 0.3), (H - 2 * pad - 20) / Math.max(y1 - y0, span * 0.3));
+    const ox = (W - s * (x1 + x0)) / 2, oy = (H - 20) / 2 + s * (y1 + y0) / 2;
+    return (x, y) => [ox + s * x, oy - s * y];
+  }
+
+  function drawMech(svg, L, st, opts = {}) {
+    svg.replaceChildren();
+    const box = svg.viewBox.baseVal;
+    const pts = [[0, 0], [L.d, 0]];
+    if (opts.trace) for (const p of opts.trace.pts) pts.push(p.A, p.B);
+    if (st) pts.push(st.A, st.B);
+    if (!opts.trace && !st) pts.push([-L.a, -L.a], [L.d + L.c, L.c]);
+    const P = fitter(pts, opts.pad ?? 18, box.width, box.height);
+    const g = el("g", {}, svg);
+    const [o2x, o2y] = P(0, 0), [o4x, o4y] = P(L.d, 0);
+    // reach of input and output tips: full circle or arc
+    const tr = opts.trace;
+    if (tr) {
+      const arcPath = (pts, key) => pts.map((p, i) => `${i ? "L" : "M"}${P(...p[key])[0].toFixed(1)},${P(...p[key])[1].toFixed(1)}`).join("");
+      el("path", { d: arcPath(tr.pts, "A"), stroke: COL.blue, "stroke-width": 6, "stroke-opacity": 0.28, fill: "none", "stroke-linecap": "round" }, g);
+      el("path", { d: arcPath(tr.pts, "B"), stroke: COL.orange, "stroke-width": 6, "stroke-opacity": 0.28, fill: "none", "stroke-linecap": "round" }, g);
+    }
+    // ground
+    el("line", { x1: o2x, y1: o2y, x2: o4x, y2: o4y, stroke: COL.muted, "stroke-width": 3, "stroke-dasharray": "6 5" }, g);
+    for (const [x, y] of [[o2x, o2y], [o4x, o4y]]) {
+      el("path", { d: `M${x},${y} l-9,14 h18 z`, fill: "#131f2e", stroke: COL.muted, "stroke-width": 2, "stroke-linejoin": "round" }, g);
+      el("line", { x1: x - 14, y1: y + 14, x2: x + 14, y2: y + 14, stroke: COL.muted, "stroke-width": 2 }, g);
+    }
+    if (st) {
+      const A = P(...st.A), B = P(...st.B);
+      el("line", { x1: o2x, y1: o2y, x2: A[0], y2: A[1], stroke: COL.blue, "stroke-width": 6, "stroke-linecap": "round" }, g);
+      el("line", { x1: A[0], y1: A[1], x2: B[0], y2: B[1], stroke: COL.yellow, "stroke-width": 5, "stroke-linecap": "round" }, g);
+      el("line", { x1: o4x, y1: o4y, x2: B[0], y2: B[1], stroke: COL.orange, "stroke-width": 6, "stroke-linecap": "round" }, g);
+      for (const [x, y] of [A, B]) el("circle", { cx: x, cy: y, r: 4.5, fill: COL.deep, stroke: COL.fg, "stroke-width": 2 }, g);
+      if (opts.labels) {
+        const mid = (p, q, dx = 0, dy = 0) => [(p[0] + q[0]) / 2 + dx, (p[1] + q[1]) / 2 + dy];
+        txt(g, ...mid([o2x, o2y], A, -14, -4), "a", COL.blue2, 15, "end", 700);
+        txt(g, ...mid(A, B, 0, -10), "b", COL.yellow, 15, "middle", 700);
+        txt(g, ...mid([o4x, o4y], B, 14, -4), "c", COL.orange2, 15, "start", 700);
+        txt(g, (o2x + o4x) / 2, o2y + 22, "d（機架）", COL.muted, 13, "middle", 600);
+        txt(g, o2x - 6, o2y + 36, "O₂ 輸入軸", COL.blue2, 12, "middle");
+        txt(g, o4x + 6, o4y + 36, "O₄ 輸出軸", COL.orange2, 12, "middle");
+        txt(g, A[0] - 6, A[1] - 10, "A", COL.fg, 12, "end");
+        txt(g, B[0] + 8, B[1] - 8, "B", COL.fg, 12);
+        // angle arcs
+        const arc = (cx, cy, r, a0, a1, col) => {
+          const p0 = [cx + r * Math.cos(a0), cy - r * Math.sin(a0)], p1 = [cx + r * Math.cos(a1), cy - r * Math.sin(a1)];
+          const large = Math.abs(a1 - a0) > Math.PI ? 1 : 0;
+          el("path", { d: `M${p0[0]},${p0[1]} A${r},${r} 0 ${large} 0 ${p1[0]},${p1[1]}`, stroke: col, "stroke-width": 1.8, fill: "none" }, g);
+        };
+        const th = Math.atan2(st.A[1], st.A[0]);
+        arc(o2x, o2y, 26, 0, th, COL.blue2);
+        txt(g, o2x + 32 * Math.cos(th / 2) + 2, o2y - 32 * Math.sin(th / 2), "θ", COL.blue2, 14, "start", 700);
+        arc(o4x, o4y, 24, 0, st.phi, COL.orange2);
+        txt(g, o4x + 30 * Math.cos(st.phi / 2), o4y - 30 * Math.sin(st.phi / 2) - 2, "φ", COL.orange2, 14, "start", 700);
+        txt(g, B[0] - 22, B[1] + 22, "μ", COL.green, 14, "middle", 700);
+      }
+    }
+    for (const [x, y] of [[o2x, o2y], [o4x, o4y]]) el("circle", { cx: x, cy: y, r: 5, fill: COL.deep, stroke: COL.fg, "stroke-width": 2 }, g);
+    return P;
+  }
+
+  // phi(theta) chart, both branches; th on 0..360, phi on -180..180 (breaks where the curve wraps)
+  function drawChart(svg, L, opts = {}) {
+    svg.replaceChildren();
+    const box = svg.viewBox.baseVal, W = box.width, H = box.height;
+    const ml = opts.small ? 30 : 44, mr = 10, mt = 10, mb = opts.small ? 24 : 34;
+    const X = (t) => ml + t / 360 * (W - ml - mr), Y = (p) => mt + (180 - p) / 360 * (H - mt - mb);
+    const fs = opts.small ? 9 : 11;
+    for (let t = 0; t <= 360; t += 90) {
+      el("line", { x1: X(t), y1: Y(180), x2: X(t), y2: Y(-180), stroke: COL.grid, "stroke-width": 1 }, svg);
+      txt(svg, X(t), H - mb + (opts.small ? 12 : 16), `${t}°`, COL.muted, fs, "middle");
+    }
+    for (let p = -180; p <= 180; p += 90) {
+      el("line", { x1: X(0), y1: Y(p), x2: X(360), y2: Y(p), stroke: COL.grid, "stroke-width": 1 }, svg);
+      txt(svg, X(0) - 4, Y(p) + 3, `${p}°`, COL.muted, fs, "end");
+    }
+    txt(svg, (X(0) + X(360)) / 2, H - 2, "輸入角 θ", COL.muted, fs, "middle");
+    if (!opts.small) {
+      const t = txt(svg, 0, 0, "輸出角 φ", COL.muted, fs, "middle");
+      t.setAttribute("transform", `translate(11 ${(Y(180) + Y(-180)) / 2}) rotate(-90)`);
+    }
+    const full = inputRange(L).full;
+    for (const sg of [1, -1]) {
+      // full input turn: follow each assembly by continuity; otherwise each branch over the reachable input range
+      const pts = full ? fullTurn(L, sg) : [];
+      if (!full) for (let i = 0; i <= 720; i++) { const th = i / 2 * D2R, s = solve(L, th, sg); pts.push(s ? { th, ...s } : null); }
+      let d = "", prev = null;
+      for (const p of pts) {
+        if (!p) { prev = null; continue; }
+        const ph = p.phi * R2D, t = p.th * R2D;
+        const jump = prev !== null && Math.abs(ph - prev) > 180;
+        d += `${prev === null || jump ? "M" : "L"}${X(t).toFixed(1)},${Y(ph).toFixed(1)}`;
+        prev = ph;
+      }
+      el("path", { d, stroke: sg > 0 ? COL.orange : COL.pink, "stroke-width": opts.small ? 2 : 2.4, fill: "none",
+        "stroke-dasharray": sg > 0 ? "" : "5 4", "stroke-linejoin": "round" }, svg);
+    }
+    return { X, Y };
+  }
+
+  // ---------- figure 1: names ----------
+  const NAMES = { a: 2.2, b: 4.6, c: 3.4, d: 4.6 };
+  drawMech(document.getElementById("fig-names"), NAMES, solve(NAMES, 62 * D2R, 1), { labels: true, pad: 30 });
+
+  // ---------- type cards ----------
+  // the first four are one Grashof chain (2, 4, 5, 4.5 round the loop), each with a different link fixed
+  const TYPES = [
+    { L: { a: 2, b: 4, c: 5, d: 4.5 }, th: 70, io: ["輸入：轉整圈", "輸出：擺動"],
+      li: ["最短桿是輸入桿：曲柄轉一圈，輸出桿在兩個極限位置間來回擺一次", "極限位置發生在輸入桿與連結桿共線（拉直與重疊）時", "去程與回程的曲柄轉角不同 → 急回運動"] },
+    { L: { a: 4, b: 5, c: 4.5, d: 2 }, th: 70, io: ["輸入：轉整圈", "輸出：轉整圈"],
+      li: ["最短桿是機架：兩軸都轉整圈，同向旋轉", "輸出角速度忽快忽慢（曲線斜率在變），用在需要變速的拖曳、振動機構", "不會有死點，傳力穩定"] },
+    { L: { a: 5, b: 4.5, c: 2, d: 4 }, th: 40, io: ["輸入：擺動", "輸出：轉整圈"],
+      li: ["最短桿是輸出桿：把來回擺動變成連續旋轉，例如腳踏縫紉機的踏板", "有兩個死點（輸出桿與連結桿共線），要靠飛輪慣性通過", "曲柄搖桿的反向使用"] },
+    { L: { a: 4.5, b: 2, c: 4, d: 5 }, th: 100, io: ["輸入：擺動", "輸出：擺動"],
+      li: ["最短桿是連結桿：輸入與輸出都只擺動，但連結桿本身能轉整圈", "到輸入的擺動端點時，連結桿翻過去，機構換到另一個組態繼續動", "例：起重機水平移動機構、部分夾爪"] },
+    { L: { a: 3, b: 5, c: 3, d: 5 }, th: 60, io: ["輸入：轉整圈", "輸出：轉整圈／擺動"], change: true,
+      li: ["s + l = p + q 的特例：平行四邊形，開口組態 φ = θ，兩軸等速同向", "攤平（θ = 0°、180°）時四桿共線，可能變成交叉的反平行四邊形，輸出改為反向不等速", "火車動輪、檯燈臂靠第三根桿或慣性避免分岔"] },
+    { L: { a: 4, b: 3, c: 3.5, d: 6 }, th: 60, io: ["輸入：擺動", "輸出：擺動"],
+      li: ["s + l > p + q：任何桿都不能轉整圈", "輸入擺到端點時（連結桿與輸出桿共線），機構換組態，輸出繼續擺", "阿克曼轉向、汽車懸吊都屬於這一類，只在小範圍內工作"] },
+  ];
+  const typesBox = document.getElementById("types");
+  TYPES.forEach((T, k) => {
+    const c = classify(T.L);
+    const card = document.createElement("div");
+    card.className = "type";
+    const tr = trace(T.L);
+    const sw = outputSwing(T.L, tr);
+    const r = tr.range;
+    const inTxt = r.full ? "轉整圈" : `擺動 ${((r.hi - r.lo) * R2D).toFixed(0)}°`;
+    const outTxt = !sw ? "—" : sw.full ? "轉整圈" : `擺動 ${sw.swing.toFixed(0)}°`;
+    const qr = c.key === "crank-rocker" ? quickReturn(T.L) : null;
+    card.innerHTML = `<h3>${k + 1}. ${c.name}<span class="en">${c.en}</span></h3>
+      <div class="lens">a = ${T.L.a}　b = ${T.L.b}　c = ${T.L.c}　d = ${T.L.d}　｜　s + l = ${c.sl.toFixed(1)}，p + q = ${c.pq.toFixed(1)}</div>
+      <div class="pics"><svg viewBox="0 0 240 190" role="img" aria-label="${c.name}機構圖"></svg><svg viewBox="0 0 240 190" role="img" aria-label="${c.name}輸出角對輸入角"></svg></div>
+      <div class="io"><span class="in">輸入軸：${inTxt}</span><span class="out">輸出軸：${outTxt}</span>${qr ? `<span class="in">急回比 Q = ${qr.Q.toFixed(2)}</span>` : ""}</div>
+      <ul>${T.li.map((x) => `<li>${x}</li>`).join("")}</ul>`;
+    typesBox.appendChild(card);
+    const [mech, chart] = card.querySelectorAll("svg");
+    drawMech(mech, T.L, solve(T.L, T.th * D2R, 1) || tr.pts[Math.floor(tr.pts.length / 4)], { trace: tr, pad: 14 });
+    drawChart(chart, T.L, { small: true });
+  });
+
+  // ---------- simulator ----------
+  const PRESETS = [["曲柄搖桿", TYPES[0].L], ["雙曲柄", TYPES[1].L], ["搖桿曲柄", TYPES[2].L], ["雙搖桿", TYPES[3].L],
+                   ["平行四邊形", TYPES[4].L], ["三搖桿", TYPES[5].L], ["阿克曼一側", { a: 2.8, b: 2.6, c: 1.8, d: 5.7 }]];
+  const S = { L: { ...TYPES[0].L }, u: 0, dir: 1, sigma: 1, playing: true, last: 0 };
+  const mechSvg = document.getElementById("sim-mech"), chartSvg = document.getElementById("sim-chart");
+  const presetsBox = document.getElementById("presets");
+  PRESETS.forEach(([name, L], i) => {
+    const b = document.createElement("button");
+    b.className = "btn"; b.textContent = name; b.setAttribute("aria-pressed", String(i === 0));
+    b.addEventListener("click", () => { setL({ ...L }); presetsBox.querySelectorAll(".btn").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); });
+    presetsBox.appendChild(b);
+  });
+  const ids = ["a", "b", "c", "d"];
+  ids.forEach((k) => document.getElementById(`s-${k}`).addEventListener("input", (ev) => {
+    S.L[k] = parseFloat(ev.target.value);
+    presetsBox.querySelectorAll(".btn").forEach((x) => x.setAttribute("aria-pressed", "false"));
+    S.prev = S.prev2 = null;   // new lengths: pick the assembly afresh
+    refresh();
+  }));
+  let chartAxes = null, marker = null, info = null;
+
+  function setL(L) {
+    S.L = L; S.u = 0.002; S.dir = 1; S.sigma = 1; S.prev = S.prev2 = null;
+    ids.forEach((k) => { document.getElementById(`s-${k}`).value = L[k]; });
+    refresh();
+  }
+
+  function refresh() {
+    ids.forEach((k) => { document.getElementById(`o-${k}`).textContent = S.L[k].toFixed(1); });
+    const c = classify(S.L);
+    const tr = c.key === "none" ? null : trace(S.L, 181, S.sigma);
+    const sw = tr ? outputSwing(S.L, tr) : null;
+    const qr = c.key === "crank-rocker" ? quickReturn(S.L) : null;
+    info = { c, tr, sw, qr };
+    document.getElementById("verdict").innerHTML = `<b>${c.name}</b> <span class="sub">${c.en}</span><br>
+      <span class="sub">s + l = ${c.sl.toFixed(2)}，p + q = ${c.pq.toFixed(2)}　→　${c.note}</span>`;
+    document.getElementById("r-sw").textContent = !sw ? "—" : sw.full ? "轉整圈" : `${sw.swing.toFixed(1)}°`;
+    document.getElementById("r-q").textContent = qr ? qr.Q.toFixed(3) : "—";
+    chartAxes = drawChart(chartSvg, S.L);
+    marker = el("circle", { r: 5, fill: COL.green, stroke: COL.deep, "stroke-width": 2, cx: -10, cy: -10 }, chartSvg);
+    if (S.u > 1) S.u = 0;
+    draw();
+  }
+
+  function currentTheta() {
+    const r = info.tr.range;
+    return r.full ? r.lo + (S.u % 1) * (r.hi - r.lo) : r.lo + S.u * (r.hi - r.lo);
+  }
+
+  function draw() {
+    if (!info || !info.tr || !info.tr.pts.length) {
+      drawMech(mechSvg, S.L, null, { pad: 26 });
+      ["r-th", "r-ph", "r-mu", "r-w"].forEach((id) => { document.getElementById(id).textContent = "—"; });
+      return;
+    }
+    const th = currentTheta();
+    let st;
+    if (info.tr.range.full && S.prev) {   // full turn: stay on the assembly the linkage is actually in
+      const f = follow(S.L, th, S.prev, S.prev2);
+      st = f.s; S.sigma = f.sigma;
+    } else st = solve(S.L, th, S.sigma) || solve(S.L, th, -S.sigma);
+    if (!st) return;
+    S.prev2 = S.prev; S.prev = st;
+    drawMech(mechSvg, S.L, st, { trace: info.tr, pad: 26 });
+    const thd = ((th * R2D) % 360 + 360) % 360;
+    document.getElementById("r-th").textContent = `${thd.toFixed(1)}°`;
+    document.getElementById("r-ph").textContent = `${(st.phi * R2D).toFixed(1)}°`;
+    document.getElementById("r-mu").textContent = `${st.mu.toFixed(1)}°`;
+    document.getElementById("r-w").textContent = isFinite(st.w) ? st.w.toFixed(2) : "∞（死點）";
+    marker.setAttribute("cx", chartAxes.X(thd)); marker.setAttribute("cy", chartAxes.Y(st.phi * R2D));
+  }
+
+  function tick(t) {
+    const dt = Math.min(0.05, (t - S.last) / 1000 || 0); S.last = t;
+    if (S.playing && info && info.tr && info.tr.pts.length) {
+      const r = info.tr.range;
+      const span = r.hi - r.lo;
+      const step = dt * 1.4 / span;   // about 1.4 rad/s of input
+      if (r.full) S.u = (S.u + step) % 1;
+      else {
+        S.u += S.dir * step;
+        if (S.u >= 1) { S.u = 1; S.dir = -1; S.sigma = -S.sigma; }   // at an end the mechanism carries on in the other branch
+        if (S.u <= 0) { S.u = 0; S.dir = 1; S.sigma = -S.sigma; }
+      }
+      draw();
+    }
+    requestAnimationFrame(tick);
+  }
+  document.getElementById("play").addEventListener("click", (ev) => {
+    S.playing = !S.playing; ev.target.textContent = S.playing ? "暫停" : "播放"; ev.target.setAttribute("aria-pressed", String(S.playing));
+  });
+  document.getElementById("branch").addEventListener("click", () => { S.sigma = -S.sigma; S.prev = S.prev2 = null; draw(); });
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { S.playing = false; document.getElementById("play").textContent = "播放"; }
+  setL({ ...TYPES[0].L });
+  requestAnimationFrame(tick);
+  window.fourbar = { solve, classify, inputRange, trace, outputSwing, quickReturn };   // for checks
+})();
+</script>
+</body>
+</html>
