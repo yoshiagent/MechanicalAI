@@ -27,6 +27,7 @@
       <li><strong>曲柄滑塊機構</strong><span class="en">（Slider-Crank）</span>：旋轉與直線往復互換，引擎活塞、空壓機的核心</li>
       <li><strong>平行四邊形連桿</strong><span class="en">（Parallelogram Linkage）</span>：對邊等長，輸出桿始終保持平行，例如檯燈臂、火車動輪連桿</li>
       <li><strong>肘節機構</strong><span class="en">（Toggle Mechanism）</span>：接近死點時用小力產生很大的力，例如衝床、快速夾鉗</li>
+      <li><strong>阿克曼轉向機構</strong><span class="en">（Ackermann Steering）</span>：轉向臂往內斜的梯形四連桿，轉彎時讓內輪轉得比外輪多，四輪輪軸線交在同一個轉彎中心；<a href="../ackermann/">理論分析 →</a></li>
     </ul>
   </section>
 
@@ -34,21 +35,41 @@
 
   <section>
     <h2 class="sec">生活中的應用</h2>
-    <div class="meta"><span class="tag">汽車雨刷</span><span class="tag">挖土機手臂</span><span class="tag">引擎活塞</span><span class="tag">折疊椅</span><span class="tag">檯燈臂</span></div>
+    <div class="meta"><span class="tag">汽車轉向</span><span class="tag">汽車雨刷</span><span class="tag">挖土機手臂</span><span class="tag">引擎活塞</span><span class="tag">折疊椅</span><span class="tag">檯燈臂</span></div>
   </section>
 
   <section>
     <h2 class="sec">模型</h2>
     <div class="grid">
-    <div class="card soon">
-      <div class="media" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M8 88 H92" stroke="#94a3b8" stroke-width="3"/><path d="M22 78 L14 88 H30 Z M80 78 L72 88 H88 Z" fill="#131f2e" stroke="#94a3b8" stroke-width="3" stroke-linejoin="round"/><path d="M22 78 L30 46 L72 26 L80 78" fill="none" stroke="#fb923c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="22" cy="78" r="4.5" fill="#07111e" stroke="#fde68a" stroke-width="2.5"/><circle cx="30" cy="46" r="4.5" fill="#07111e" stroke="#fde68a" stroke-width="2.5"/><circle cx="72" cy="26" r="4.5" fill="#07111e" stroke="#fde68a" stroke-width="2.5"/><circle cx="80" cy="78" r="4.5" fill="#07111e" stroke="#fde68a" stroke-width="2.5"/></svg></div>
+    <a class="card" href="../ackermann/">
+      <div class="media"><img src="../ackermann/thumb.jpg" width="960" height="600" alt="MG90S 前輪轉向打到底的俯視圖：曲柄推動兩支拉桿，內輪轉得比外輪多"></div>
       <div class="body">
-        <h2>模型製作中<span class="en">Coming soon</span></h2>
-        <ul><li>這一類的 3D 列印模型與動畫還在規劃中</li></ul>
-        <span class="go">敬請期待</span>
+        <h2>阿克曼轉向機構<span class="en">Ackermann Steering</span></h2>
+        <ul>
+          <li>阿克曼條件推導：<strong>cot δo − cot δi = 主銷距 ÷ 軸距</strong></li>
+          <li>伺服曲柄＋兩支拉桿：每側一組四連桿，用兩圓交點求輪子轉角</li>
+          <li>打到底內輪 32.3°／外輪 25.9°，全行程誤差最大 <strong>0.83°</strong></li>
+        </ul>
+        <div class="meta"><span class="tag">四連桿 Four-Bar</span><span class="tag">MG90S 伺服機</span><span class="tag">6 張分析圖</span></div>
+        <span class="go">閱讀理論分析 →</span>
       </div>
+    </a>
+
+    <a class="card" href="/3dp-portfolio/demo/steering_animation.html">
+      <div class="media"><img src="../ackermann/thumb_animation.jpg" width="960" height="600" alt="MG90S 前輪轉向機構組合模型：伺服座、曲柄、拉桿、轉向節與 LEGO 前輪"></div>
+      <div class="body">
+        <h2>轉向機構 3D 動畫與列印檔<span class="en">Model &amp; Animation</span></h2>
+        <ul>
+          <li>9 步組裝動畫，轉向示範即時計算輪子轉角與阿克曼誤差</li>
+          <li>FreeCAD 參數化零件、3MF 一盤列印檔（3D 列印作品集）</li>
+          <li>LEGO Technic 相容，可裝到差速轉向車上</li>
+        </ul>
+        <div class="meta"><span class="tag">3D 列印</span><span class="tag">FCStd</span><span class="tag">3MF</span></div>
+        <span class="go">開啟動畫 ↗</span>
+      </div>
+    </a>
     </div>
-    </div>
+    <p class="callout" style="margin-top: 18px">模型檔案與完整設計說明在 3D 列印作品集：<a href="/3dp-portfolio/works/mg90s-steering.html">MG90S 伺服機前輪轉向機構（阿克曼）</a>、<a href="/3dp-portfolio/works/car-model.html">差速轉向車</a></p>
   </section>
 
   <footer>MechanicalAI · 機構學 / 連桿</footer>
