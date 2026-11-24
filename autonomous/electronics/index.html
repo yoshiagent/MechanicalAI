@@ -43,6 +43,9 @@
     .arch { grid-template-columns: 1fr; }
     .arrow { transform: rotate(90deg); line-height: 1; }
   }
+  .sch { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+  .sch img { display: block; width: 100%; height: auto; border-radius: 6px; background: #f5f4ef; }
+  .sch figcaption { color: var(--muted); font-size: 0.88rem; margin-top: 8px; }
   .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
   .steps > li { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px 12px 56px; position: relative; }
   .steps > li::before { counter-increment: s; content: counter(s); position: absolute; left: 14px; top: 12px; width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: 0.9rem; }
@@ -175,8 +178,21 @@
     </ul>
   </section>
 
+  <section id="wiring">
+    <h2 class="sec">五、接線圖（KiCad）</h2>
+    <figure class="sch">
+      <a href="wiring.svg" target="_blank" rel="noopener"><img src="wiring.svg" width="1588" height="1123" loading="lazy" alt="自駕車 KiCad 接線圖：電源、ESP32 主控、TB6612 與兩顆馬達、五種感測器模組的腳位連接"></a>
+      <figcaption>點圖開新分頁放大。同名標籤（例：SDA、MOT_PWM）代表相連，所有 GND 共地，✕ 為不接的腳位。</figcaption>
+    </figure>
+    <ul style="margin-top:12px">
+      <li><strong>電源</strong>：2 × 18650 經開關成 +BATT（7.4 V）→ TB6612 VM；降壓模組輸出 +5V → ESP32 VIN、伺服機、ESP32-CAM；ESP32 板上 3V3 → 所有感測器、編碼器、TB6612 邏輯</li>
+      <li><strong>檢查</strong>：KiCad 電氣規則檢查（ERC）<strong>0 違規</strong>；匯出的網表和上方腳位表逐一比對相符。尚未實際接線驗證</li>
+      <li><strong>下載</strong>：<a href="autonomous_car_wiring.pdf" style="color:var(--blue-soft)">PDF（A3）</a>、<a href="autonomous_car_kicad.zip" style="color:var(--blue-soft)">KiCad 專案 ZIP</a>（電路圖、自訂模組符號庫、產生器 <code>gen_schematic.py</code>，用 KiCad 10 開啟 <code>autonomous_car.kicad_pro</code>）</li>
+    </ul>
+  </section>
+
   <section>
-    <h2 class="sec">五、路徑規劃用的車輛參數</h2>
+    <h2 class="sec">六、路徑規劃用的車輛參數</h2>
     <p>阿克曼轉向車可以簡化成<strong>單車模型</strong>（Bicycle Model）：前後各一個輪子，前輪轉角 δ。</p>
     <div class="formula">轉彎半徑（後軸中點）  R = L / tan δ
 L = 160 mm，主銷距 w = 80 mm
@@ -192,7 +208,7 @@ Pure Pursuit 轉向角  δ = atan( 2 L sin α / Ld )
   </section>
 
   <section>
-    <h2 class="sec">六、分階段實作</h2>
+    <h2 class="sec">七、分階段實作</h2>
     <ol class="steps">
       <li>
         <h3>遙控車 <span class="lvl b">第 1 階段</span></h3>
@@ -231,7 +247,7 @@ Pure Pursuit 轉向角  δ = atan( 2 L sin α / Ld )
       <li><strong>感測器支架</strong>：做成 LEGO Technic 相容，用 pin 插在底盤上，循跡模組在車頭下方、ToF 在車頭前緣、攝影機在車頂</li>
       <li><strong>雙 18650 電池座</strong>：沿用單顆電池座的 Technic 外框做法，改成兩顆並排</li>
       <li><strong>重心</strong>：電池放低、放在兩軸之間；攝影機桅桿不要太高，避免轉彎翻車</li>
-      <li><strong>接線圖</strong>：可用 KiCad 畫電路圖（Schematic），對照上面的腳位表</li>
+      <li><strong>麵包板配置</strong>：依<a href="#wiring" style="color:var(--blue-soft)">接線圖</a>排定 ESP32、TB6612 在 400 孔麵包板上的位置，感測器線材走底盤下方</li>
     </ul>
   </section>
 
