@@ -75,7 +75,7 @@
     <ul>
       <li><strong>驅動</strong>：TT 減速馬達 × 1 → 小齒輪 → 傘齒輪差速器 → 兩後輪（<a href="/3dp-portfolio/works/electric-differential.html" style="color:var(--blue-soft)">電動差速器</a>）</li>
       <li><strong>轉向</strong>：MG90S 伺服機 → 曲柄 → 兩支拉桿，阿克曼梯形（<a href="../../Mechanism/ackermann/" style="color:var(--blue-soft)">理論分析</a>）</li>
-      <li><strong>電源</strong>：兩個 18650 電池座直立、夾在直立的 TT 馬達兩側（2 顆串聯 7.4 V），麵包板底座架在電池座上；原本的 3 × AAA 電池盒已拿掉</li>
+      <li><strong>電源</strong>：雙 18650 電池座（2 顆串聯 7.4 V）翻過來和麵包板座背對背用銷接成上層；原本的 3 × AAA 電池盒已拿掉</li>
       <li><strong>電路</strong>：半尺寸 400 孔麵包板，裝在車頂的 Technic 底座上</li>
     </ul>
     <p class="callout" style="margin-top:12px"><strong>結論</strong>：機構已經和真車一樣（後驅＋前輪阿克曼轉向），只要再加<strong>主控板、馬達驅動、電源、感測器</strong>四類元件。</p>
@@ -245,8 +245,8 @@ Pure Pursuit 轉向角  δ = atan( 2 L sin α / Ld )
     <h2 class="sec">機構面要配合的事</h2>
     <ul>
       <li><strong>感測器支架</strong>：做成 LEGO Technic 相容，用 pin 插在底盤上，循跡模組在車頭下方、ToF 在車頭前緣、攝影機在車頂</li>
-      <li><strong>18650 電池座</strong>：已完成，兩個 12 格單節電池座直立、開口朝外，站在底盤上夾住直立的 TT 馬達，麵包板底座架在上面，換電池不用拆車</li>
-      <li><strong>重心</strong>：電池在兩軸之間、左右對稱，但麵包板底座離地 120 mm、車高約 136 mm，重心偏高；攝影機桅桿不要太高，轉彎先減速，避免翻車</li>
+      <li><strong>18650 電池座</strong>：已完成，雙 18650 電池座（13 × 9 × 3）和麵包板座同尺寸，背對背用 LEGO 銷接在一起、架在四根立柱上；換電池要把上層整組拆下</li>
+      <li><strong>重心</strong>：電池在兩軸之間、車身正中，電池座下緣離地 66 mm、車高約 106 mm；攝影機桅桿不要太高，避免轉彎翻車</li>
       <li><strong>麵包板配置</strong>：依<a href="#wiring" style="color:var(--blue-soft)">接線圖</a>排定 ESP32、TB6612 在 400 孔麵包板上的位置，感測器線材走底盤下方</li>
     </ul>
   </section>
