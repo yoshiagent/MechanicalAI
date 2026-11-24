@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>自駕車電子元件建議方案 · MechanicalAI</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<style>
+  html { overflow-x: hidden; }
+  .wrap { max-width: 960px; grid-template-columns: minmax(0, 1fr); }
+  .wrap > * { min-width: 0; }
+  section > p { margin: 0 0 10px; }
+  .doc ul, .doc ol { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+  .doc li::marker { color: var(--blue); }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 10px; }
+  .kpi { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+  .kpi b { display: block; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+  .kpi span { color: var(--muted); font-size: 0.85rem; }
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  th, td { padding: 8px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; background: var(--deep); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.nw { white-space: nowrap; }
+  td .en { color: var(--muted); font-size: 0.85em; }
+  code { font-family: var(--mono); font-size: 0.88em; color: #7dd3fc; background: var(--deep); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; white-space: nowrap; }
+  .formula { background: var(--deep); border: 1px solid rgba(59,130,246,.35); color: #7dd3fc; border-radius: 8px; padding: 10px 14px; font-family: var(--mono); font-size: 0.92rem; overflow-x: auto; white-space: pre; margin: 10px 0; }
+  .lvl { display: inline-block; font-size: 0.75rem; border-radius: 999px; padding: 0 8px; border: 1px solid; white-space: nowrap; }
+  .lvl.b { color: #4ade80; border-color: rgba(74,222,128,.4); }
+  .lvl.m { color: #fbbf24; border-color: rgba(251,191,36,.4); }
+  .lvl.a { color: #f87171; border-color: rgba(248,113,113,.4); }
+
+  /* system block diagram: three columns, stacks on phones */
+  .arch { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 10px; align-items: center; }
+  .col { display: grid; gap: 10px; }
+  .col h3 { margin: 0; font-size: 0.8rem; letter-spacing: .08em; color: var(--muted); font-family: var(--mono); text-transform: uppercase; }
+  .blk { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--c, var(--blue)); border-radius: 8px; padding: 8px 12px; font-size: 0.9rem; line-height: 1.45; }
+  .blk b { display: block; }
+  .blk small { color: var(--muted); }
+  .arrow { color: var(--orange); font-size: 1.6rem; text-align: center; }
+  @media (max-width: 720px) {
+    .arch { grid-template-columns: 1fr; }
+    .arrow { transform: rotate(90deg); line-height: 1; }
+  }
+  .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  .steps > li { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 16px 12px 56px; position: relative; }
+  .steps > li::before { counter-increment: s; content: counter(s); position: absolute; left: 14px; top: 12px; width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: 0.9rem; }
+  .steps h3 { margin: 0 0 4px; font-size: 1.02rem; }
+  .steps ul { margin: 0; padding-left: 1.2em; font-size: 0.92rem; }
+  .steps li li::marker { color: var(--blue); }
+</style>
+</head>
+<body>
+<main class="wrap doc">
+  <nav class="crumbs" aria-label="導覽"><a href="../../">MechanicalAI</a><span>/</span><a href="../">自駕車</a><span>/</span><span>電子元件建議方案</span></nav>
+
+  <header class="hero">
+    <span class="eyebrow">Electronics Plan</span>
+    <h1>自駕車電子元件建議方案</h1>
+    <p class="lead">把<a href="/3dp-portfolio/works/car-model.html" style="color:var(--blue-soft)">差速轉向車</a>改裝成可以自己循線、避障、看車道的自駕模擬車：先列出必備的主控、驅動與電源，再依目標分級選感測器，最後分四個階段實作。</p>
+    <div class="kpis">
+      <div class="kpi"><b>160 mm</b><span>軸距（Wheelbase）</span></div>
+      <div class="kpi"><b>32.3° ／ 25.9°</b><span>轉向打到底：內輪／外輪</span></div>
+      <div class="kpi"><b>≈ 291 mm</b><span>最小轉彎半徑（後軸中點）</span></div>
+      <div class="kpi"><b>TT 馬達 × 1</b><span>經差速器驅動兩後輪</span></div>
+    </div>
+  </header>
+
+  <section>
+    <h2 class="sec">車上已有的零件</h2>
+    <ul>
+      <li><strong>驅動</strong>：TT 減速馬達 × 1 → 小齒輪 → 傘齒輪差速器 → 兩後輪（<a href="/3dp-portfolio/works/electric-differential.html" style="color:var(--blue-soft)">電動差速器</a>）</li>
+      <li><strong>轉向</strong>：MG90S 伺服機 → 曲柄 → 兩支拉桿，阿克曼梯形（<a href="../../Mechanism/ackermann/" style="color:var(--blue-soft)">理論分析</a>）</li>
+      <li><strong>電源</strong>：3 × AAA 電池盒（4.5 V）；另有單顆 18650 的 Technic 電池座</li>
+      <li><strong>電路</strong>：半尺寸 400 孔麵包板，裝在車頂的 Technic 底座上</li>
+    </ul>
+    <p class="callout" style="margin-top:12px"><strong>結論</strong>：機構已經和真車一樣（後驅＋前輪阿克曼轉向），只要再加<strong>主控板、馬達驅動、電源、感測器</strong>四類元件。</p>
+  </section>
+
+  <section>
+    <h2 class="sec">系統架構</h2>
+    <div class="arch" role="img" aria-label="系統架構：電池經降壓供電給主控與伺服機，主控讀取感測器後控制馬達驅動與伺服機">
+      <div class="col">
+        <h3>電源</h3>
+        <div class="blk" style="--c:#4ade80"><b>2 × 18650 串聯</b><small>7.4 V，附保護板（BMS）＋開關</small></div>
+        <div class="blk" style="--c:#4ade80"><b>5 V／3 A 降壓模組</b><small>供 ESP32、伺服機、感測器</small></div>
+      </div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="col">
+        <h3>大腦</h3>
+        <div class="blk" style="--c:#fb923c"><b>ESP32 DevKit V1</b><small>PWM、I²C、WiFi／藍牙</small></div>
+        <div class="blk" style="--c:#a78bfa"><b>感測器</b><small>循跡、ToF、IMU、編碼器、攝影機</small></div>
+        <div class="blk" style="--c:#94a3b8"><b>電腦（選用）</b><small>WiFi 接收影像、跑 OpenCV</small></div>
+      </div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="col">
+        <h3>致動</h3>
+        <div class="blk"><b>TB6612FNG → TT 馬達</b><small>VM 直接接 7.4 V，控制車速與正反轉</small></div>
+        <div class="blk"><b>MG90S 伺服機</b><small>50 Hz PWM 控制轉向角</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">一、必備元件：讓車能自己動</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>類別</th><th>建議元件</th><th>理由</th></tr></thead>
+      <tbody>
+        <tr><td class="nw">主控板</td><td class="nw"><strong>ESP32 DevKit V1</strong>（30 腳）</td><td>內建 WiFi／藍牙，可把感測資料傳到電腦、從手機或電腦下指令；PWM 和 I²C 腳位夠用。插上 400 孔麵包板兩側只剩約 1 排孔，接線較擠</td></tr>
+        <tr><td class="nw">馬達驅動</td><td class="nw"><strong>TB6612FNG</strong></td><td>只用 A 通道驅動 TT 馬達；連續 1.2 A、峰值 3.2 A，模組小可直插麵包板，壓降遠小於 L298N</td></tr>
+        <tr><td class="nw">轉向</td><td class="nw">MG90S（已有）</td><td>50 Hz PWM，脈寬控制角度</td></tr>
+        <tr><td class="nw">電池</td><td class="nw"><strong>2 × 18650</strong> 串聯＋保護板</td><td>7.4 V，容量 2500～3000 mAh；取代 3 × AAA（見下方電源規劃）</td></tr>
+        <tr><td class="nw">降壓</td><td class="nw"><strong>5 V／3 A</strong> 降壓模組<br><span class="en">例：MP1584、Mini560</span></td><td>供伺服機與 ESP32；伺服機堵轉電流大，要留餘裕</td></tr>
+        <tr><td class="nw">雜項</td><td>電源開關、470～1000 µF 電解電容、杜邦線、XH 接頭</td><td>電容並在伺服機電源旁，避免轉向瞬間電壓下降讓 ESP32 重開機</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2 class="sec">二、電源規劃</h2>
+    <ul>
+      <li>3 × AAA 只有 4.5 V，伺服機卡住時電流 <strong>0.7 A 以上</strong>，電壓一掉 ESP32 就會重開機</li>
+      <li>改用 <strong>2 × 18650（7.4 V）</strong>：TB6612 的 VM 直接接電池，伺服機和邏輯電路走降壓後的 5 V</li>
+      <li>TT 馬達額定 3～6 V：程式把 PWM 上限設在 <strong>約 70 %</strong>（平均約 5.2 V），避免過壓</li>
+      <li>目前的 18650 Technic 電池座是單顆，<strong>需要另做雙顆版</strong>（兩顆約 90 g）</li>
+    </ul>
+    <div class="tablewrap" style="margin-top:12px"><table>
+      <thead><tr><th>負載</th><th>電源</th><th>平常</th><th>峰值</th></tr></thead>
+      <tbody>
+        <tr><td>ESP32（WiFi 開）</td><td class="nw">5 V</td><td class="nw">約 0.25 A</td><td class="nw">約 0.5 A</td></tr>
+        <tr><td>MG90S 伺服機</td><td class="nw">5 V</td><td class="nw">0.1～0.3 A</td><td class="nw">約 0.7 A（堵轉）</td></tr>
+        <tr><td>感測器（ToF × 3、IMU、循跡）</td><td class="nw">3.3／5 V</td><td class="nw">約 0.1 A</td><td class="nw">約 0.1 A</td></tr>
+        <tr><td>ESP32-CAM（選用）</td><td class="nw">5 V</td><td class="nw">約 0.2 A</td><td class="nw">約 0.3 A</td></tr>
+        <tr><td><strong>5 V 合計</strong></td><td></td><td class="nw">約 0.7 A</td><td class="nw"><strong>約 1.6 A</strong> → 選 3 A 降壓</td></tr>
+        <tr><td>TT 馬達</td><td class="nw">7.4 V（經 TB6612）</td><td class="nw">0.15～0.3 A</td><td class="nw">1 A 以上（起步／卡住）</td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin-top:8px; color:var(--muted); font-size:.88rem">電流為常見規格的估計值，實際以各模組資料表與實測為準。</p>
+  </section>
+
+  <section>
+    <h2 class="sec">三、自駕感測器：依目標分級</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>等級</th><th>目標</th><th>元件</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr><td><span class="lvl b">入門</span></td><td class="nw">循黑線</td><td><strong>5 路紅外線循跡模組</strong><br><span class="en">TCRT5000</span></td><td>裝在車頭下方，離地約 1～2 cm；用 PID 算轉向角</td></tr>
+        <tr><td><span class="lvl b">入門</span></td><td class="nw">避障</td><td><strong>VL53L0X／VL53L1X ToF 測距</strong> × 3</td><td>前、左前、右前各一；I²C、3.3 V，比 HC-SR04 超音波小也準。三顆同位址，用 XSHUT 腳開機時逐一改位址</td></tr>
+        <tr><td><span class="lvl m">進階</span></td><td class="nw">航向、里程</td><td><strong>MPU6050</strong>（或 BNO085）IMU<br>＋<strong>附編碼器的 TT 馬達</strong></td><td>編碼器在差速器前的馬達軸上，量到的是兩後輪的<strong>平均速度</strong>，正好用來算里程（Odometry）。換編碼器馬達前要檢查驅動模組空間</td></tr>
+        <tr><td><span class="lvl m">進階</span></td><td class="nw">車道辨識</td><td>A：<strong>ESP32-CAM</strong><br>B：<strong>Raspberry Pi Zero 2 W ＋ Camera Module 3</strong></td><td>A 最便宜：影像用 WiFi 傳到電腦跑 OpenCV，再回傳轉向指令。B 在車上直接辨識，但 5 V 要供到 2.5 A</td></tr>
+        <tr><td><span class="lvl a">高階</span></td><td class="nw">建圖、定位</td><td><strong>LD06／LD19 2D 光達</strong></td><td>裝在車頂，做 SLAM；需要 Raspberry Pi 等級的電腦處理</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2 class="sec">四、ESP32 腳位建議</h2>
+    <div class="tablewrap"><table>
+      <thead><tr><th>功能</th><th>元件腳位</th><th>ESP32 GPIO</th></tr></thead>
+      <tbody>
+        <tr><td>轉向</td><td>MG90S 訊號線</td><td><code>13</code></td></tr>
+        <tr><td>馬達</td><td>TB6612 PWMA ／ AIN1 ／ AIN2</td><td><code>25</code> <code>26</code> <code>27</code></td></tr>
+        <tr><td>馬達</td><td>TB6612 STBY</td><td><code>33</code>（或直接接 3.3 V）</td></tr>
+        <tr><td>I²C 匯流排</td><td>SDA ／ SCL（ToF × 3、MPU6050）</td><td><code>21</code> <code>22</code></td></tr>
+        <tr><td>ToF 位址設定</td><td>XSHUT × 3</td><td><code>4</code> <code>16</code> <code>17</code></td></tr>
+        <tr><td>循跡</td><td>5 路數位輸出</td><td><code>32</code> <code>34</code> <code>35</code> <code>36</code> <code>39</code></td></tr>
+        <tr><td>編碼器</td><td>A 相 ／ B 相</td><td><code>18</code> <code>19</code></td></tr>
+      </tbody>
+    </table></div>
+    <ul style="margin-top:12px">
+      <li>避開開機設定腳（Strapping Pins）<code>0</code> <code>2</code> <code>5</code> <code>12</code> <code>15</code>，以免接上感測器後開不了機</li>
+      <li><code>34</code> <code>35</code> <code>36</code> <code>39</code> 只能輸入、沒有內部上拉，適合接循跡模組（模組自帶上拉）</li>
+      <li>ESP32 腳位是 <strong>3.3 V</strong>：感測器盡量接 3.3 V 供電；若用 HC-SR04（5 V），Echo 腳要加分壓電阻</li>
+      <li>TB6612：VCC 接 3.3 V（邏輯），VM 接 7.4 V 電池，GND 全部共地</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="sec">五、路徑規劃用的車輛參數</h2>
+    <p>阿克曼轉向車可以簡化成<strong>單車模型</strong>（Bicycle Model）：前後各一個輪子，前輪轉角 δ。</p>
+    <div class="formula">轉彎半徑（後軸中點）  R = L / tan δ
+L = 160 mm，主銷距 w = 80 mm
+打到底：內輪 32.3°、外輪 25.9° → R ≈ 291 mm
+
+Pure Pursuit 轉向角  δ = atan( 2 L sin α / Ld )
+α：車頭方向與「前視點」的夾角，Ld：前視距離</div>
+    <ul>
+      <li>前視距離 Ld 建議從 <strong>2～3 倍軸距</strong>（約 30～50 cm）開始調；太短會左右擺，太長會切彎</li>
+      <li>伺服機角度和輪子轉角不是線性關係，可用<a href="../../Mechanism/ackermann/" style="color:var(--blue-soft)">阿克曼分析頁</a>的四連桿解查表</li>
+      <li>迴轉時後輪外側半徑約 291 + 65 ≈ <strong>356 mm</strong>（後輪距 130 mm），場地轉彎處要留夠寬</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="sec">六、分階段實作</h2>
+    <ol class="steps">
+      <li>
+        <h3>遙控車 <span class="lvl b">第 1 階段</span></h3>
+        <ul>
+          <li>元件：ESP32、TB6612FNG、雙 18650、5 V 降壓、開關、電容</li>
+          <li>ESP32 開 WiFi 網頁或藍牙，用手機控制車速與轉向；確認伺服機中位與左右極限角度</li>
+        </ul>
+      </li>
+      <li>
+        <h3>循線與避障 <span class="lvl b">第 2 階段</span></h3>
+        <ul>
+          <li>元件：5 路循跡模組、VL53L0X × 3</li>
+          <li>循線用 PID 控制轉向；避障用狀態機：前方太近 → 減速 → 往空的一側轉</li>
+        </ul>
+      </li>
+      <li>
+        <h3>定位 <span class="lvl m">第 3 階段</span></h3>
+        <ul>
+          <li>元件：MPU6050、附編碼器的 TT 馬達</li>
+          <li>編碼器算車速做定速控制；IMU 航向＋里程推算位置（Dead Reckoning），可以走指定路線</li>
+        </ul>
+      </li>
+      <li>
+        <h3>視覺車道追蹤 <span class="lvl m">第 4 階段</span></h3>
+        <ul>
+          <li>元件：ESP32-CAM（或 Raspberry Pi Zero 2 W ＋ 攝影機）</li>
+          <li>OpenCV 找車道線 → 算車道中心 → Pure Pursuit 算轉向角；之後可再試深度學習（如 Donkey Car 方式的行為複製）</li>
+        </ul>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2 class="sec">機構面要配合的事</h2>
+    <ul>
+      <li><strong>感測器支架</strong>：做成 LEGO Technic 相容，用 pin 插在底盤上，循跡模組在車頭下方、ToF 在車頭前緣、攝影機在車頂</li>
+      <li><strong>雙 18650 電池座</strong>：沿用單顆電池座的 Technic 外框做法，改成兩顆並排</li>
+      <li><strong>重心</strong>：電池放低、放在兩軸之間；攝影機桅桿不要太高，避免轉彎翻車</li>
+      <li><strong>接線圖</strong>：可用 KiCad 畫電路圖（Schematic），對照上面的腳位表</li>
+    </ul>
+  </section>
+
+  <footer>MechanicalAI · 自駕車 / 電子元件建議方案<br>車輛尺寸來自<a href="/3dp-portfolio/works/car-model.html" style="color:var(--blue-soft)">差速轉向車作品頁</a>與<a href="../../Mechanism/ackermann/" style="color:var(--blue-soft)">阿克曼轉向理論分析</a>；元件規格為常見值，選購時以各廠商資料表為準。</footer>
+</main>
+</body>
+</html>

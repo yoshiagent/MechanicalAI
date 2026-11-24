@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>自駕車 · MechanicalAI</title>
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<main class="wrap">
+  <nav class="crumbs" aria-label="導覽"><a href="../">MechanicalAI</a><span>/</span><span>自駕車</span></nav>
+
+  <header class="hero cat-hero">
+    <div class="cat-icon" aria-hidden="true"><svg viewBox="0 0 100 100" stroke-linecap="round" stroke-linejoin="round"><path d="M34 9 A22 22 0 0 1 66 9" fill="none" stroke="#fb923c" stroke-width="3"/><path d="M40 15 A13 13 0 0 1 60 15" fill="none" stroke="#fb923c" stroke-width="3"/><rect x="22" y="30" width="9" height="17" rx="2.5" fill="#94a3b8"/><rect x="69" y="30" width="9" height="17" rx="2.5" fill="#94a3b8"/><rect x="22" y="68" width="9" height="17" rx="2.5" fill="#94a3b8"/><rect x="69" y="68" width="9" height="17" rx="2.5" fill="#94a3b8"/><rect x="29" y="22" width="42" height="70" rx="12" fill="#3b82f6"/><rect x="36" y="31" width="28" height="12" rx="3" fill="#07111e"/><rect x="40" y="55" width="20" height="20" rx="3" fill="#fb923c"/><path d="M44 55 V51 M50 55 V51 M56 55 V51 M44 75 V79 M50 75 V79 M56 75 V79" stroke="#fb923c" stroke-width="2"/><circle cx="50" cy="65" r="3.5" fill="#07111e"/></svg></div>
+    <div class="hero">
+      <span class="eyebrow">Autonomous Car</span>
+      <h1>自駕車</h1>
+      <p class="lead">用 3D 列印的差速轉向車模擬自駕車：後輪由一顆 TT 馬達經差速器驅動，前輪由 MG90S 伺服機做阿克曼轉向，結構和真車一樣，可以直接套用真車的路徑追蹤方法。</p>
+    </div>
+  </header>
+
+  <section>
+    <h2 class="sec">自駕系統的組成</h2>
+    <ul class="kinds">
+      <li><strong>感知</strong><span class="en">（Perception）</span>：紅外線循跡、ToF 測距、攝影機、光達，量出車道和障礙物在哪裡</li>
+      <li><strong>定位</strong><span class="en">（Localization）</span>：IMU 量航向、馬達編碼器量里程，推算車子目前位置</li>
+      <li><strong>規劃</strong><span class="en">（Planning）</span>：決定要走的路線，例如沿車道中心線、繞過障礙物</li>
+      <li><strong>控制</strong><span class="en">（Control）</span>：用 PID、Pure Pursuit 算出轉向角和車速，送給伺服機和馬達；<a href="../Mechanism/ackermann/">阿克曼轉向理論 →</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="sec">內容</h2>
+    <div class="grid">
+    <a class="card" href="electronics/">
+      <div class="media" aria-hidden="true"><svg viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="30" y="30" width="40" height="40" rx="5" fill="#131f2e" stroke="#3b82f6" stroke-width="4"/><path d="M38 30 V18 M50 30 V18 M62 30 V18 M38 70 V82 M50 70 V82 M62 70 V82 M30 40 H18 M30 50 H18 M30 60 H18 M70 40 H82 M70 50 H82 M70 60 H82" stroke="#3b82f6" stroke-width="4"/><circle cx="50" cy="50" r="8" fill="#fb923c" stroke="none"/></svg></div>
+      <div class="body">
+        <h2>電子元件建議方案<span class="en">Electronics Plan</span></h2>
+        <ul>
+          <li>必備：ESP32 主控、TB6612FNG 馬達驅動、雙 18650 電源</li>
+          <li>感測器依目標分級：循跡、避障、IMU／編碼器、視覺、光達</li>
+          <li>系統架構、電流預算、ESP32 腳位與四階段實作路線</li>
+        </ul>
+        <div class="meta"><span class="tag">元件清單</span><span class="tag">腳位表</span><span class="tag">4 階段</span></div>
+        <span class="go">閱讀方案 →</span>
+      </div>
+    </a>
+
+    <a class="card" href="/3dp-portfolio/works/car-model.html">
+      <div class="media"><img src="thumb.jpg" width="960" height="600" alt="差速轉向車前斜視圖：上方淺藍色麵包板底座，前輪由黃色曲柄與拉桿轉向"></div>
+      <div class="body">
+        <h2>差速轉向車 3D 模型<span class="en">Car Model</span></h2>
+        <ul>
+          <li>電動差速器＋MG90S 阿克曼轉向＋電池盒＋麵包板底座</li>
+          <li>LEGO Technic 相容，4 盤 28 件，FCStd／3MF 下載與組裝動畫</li>
+        </ul>
+        <div class="meta"><span class="tag">3D 列印</span><span class="tag">FCStd</span><span class="tag">3MF</span></div>
+        <span class="go">前往作品頁 ↗</span>
+      </div>
+    </a>
+    </div>
+  </section>
+
+  <footer>MechanicalAI · 自駕車</footer>
+</main>
+</body>
+</html>
