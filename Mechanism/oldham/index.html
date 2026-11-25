@@ -59,7 +59,7 @@ tr:last-child td { border-bottom: 0; }
   <header class="hero">
     <span class="eyebrow">Oldham Coupling</span>
     <h1>十字滑塊聯軸器</h1>
-    <p class="lead">兩根平行但錯開的軸，用一個兩面各有凸條的滑塊連起來：滑塊一邊轉一邊滑，兩軸轉速永遠完全相同。本頁用泰勒斯定理說明滑塊怎麼動，並以差速轉向車上自印的聯軸器為例。</p>
+    <p class="lead">兩根平行但錯開的軸，用一個兩面各有凸條的滑塊連起來：滑塊一邊轉一邊滑，兩軸轉速永遠完全相同。本頁用泰勒斯定理說明滑塊怎麼動，並以自印的「差速器＋十字滑塊聯軸器＋TT 馬達」驅動模組為例。</p>
   </header>
 
   <section>
@@ -110,7 +110,7 @@ P = e·cos φ · (cos φ, sin φ) = ( e/2 + (e/2)·cos 2φ ,  (e/2)·sin 2φ )
         <div class="key"><span><i style="background:#3b82f6"></i>輸入輪轂與直槽（後）</span><span><i style="background:#fb923c"></i>輸出輪轂與橫槽（前）</span><span><i style="background:#f87171"></i>滑塊</span><span><i style="background:#fde68a"></i>滑塊中心軌跡</span></div>
         <div class="slider"><label for="s-e">偏移量 e</label><input id="s-e" type="range" min="0" max="20" step="0.5" value="12"><output id="o-e">12 mm</output></div>
         <div class="slider"><label for="s-n">轉速</label><input id="s-n" type="range" min="10" max="3000" step="10" value="200"><output id="o-n">200 rpm</output></div>
-        <div class="presets"><button class="btn" id="play" aria-pressed="true">暫停</button><button class="btn" id="slow" aria-pressed="false">慢動作</button><button class="btn" id="car">差速轉向車（e = 12 mm、200 rpm）</button></div>
+        <div class="presets"><button class="btn" id="play" aria-pressed="true">暫停</button><button class="btn" id="slow" aria-pressed="false">慢動作</button><button class="btn" id="car">TT 馬達驅動模組（e = 12 mm、200 rpm）</button></div>
         <div class="readout">
           <div><b>輸入角 φ</b><output id="r-in">—</output></div>
           <div><b>輸出角</b><output id="r-out">—</output></div>
@@ -122,7 +122,7 @@ P = e·cos φ · (cos φ, sin φ) = ( e/2 + (e/2)·cos 2φ ,  (e/2)·sin 2φ )
           <div><b>離心力（1.4 g 滑塊）</b><output id="r-f">—</output></div>
           <div><b>速度比</b><output>1.000</output></div>
         </div>
-        <p style="margin:0; color: var(--muted); font-size: .85rem">畫面以輪轂 Ø40、凸條長 15 mm（差速轉向車的尺寸）繪製；動畫轉速固定放慢，數值以設定轉速計算。白線 O₁P、O₂P 永遠垂直，所以 P 一直在黃色圓上。1.4 g 是 PLA 實心滑塊的估計重量。</p>
+        <p style="margin:0; color: var(--muted); font-size: .85rem">畫面以輪轂 Ø40、凸條長 15 mm（驅動模組的尺寸）繪製；動畫轉速固定放慢，數值以設定轉速計算。白線 O₁P、O₂P 永遠垂直，所以 P 一直在黃色圓上。1.4 g 是 PLA 實心滑塊的估計重量。</p>
       </div>
     </div>
   </section>
@@ -152,10 +152,10 @@ P = e·cos φ · (cos φ, sin φ) = ( e/2 + (e/2)·cos 2φ ,  (e/2)·sin 2φ )
   </section>
 
   <section>
-    <h2 class="sec">5. 實例：差速轉向車的聯軸器</h2>
+    <h2 class="sec">5. 實例：差速器＋十字滑塊聯軸器＋TT 馬達</h2>
     <div class="two">
-      <figure><img src="thumb.jpg" width="960" height="600" alt="裝在車上的十字滑塊聯軸器：TT 馬達、馬達端輪轂、紅色滑塊、軸端輪轂、11 齒小齒輪">
-        <figcaption>圖 3　裝在車上：黃色 TT 馬達 → 馬達端輪轂 → 紅色滑塊 → 軸端輪轂 → 11 齒小齒輪（差速器輸入）。</figcaption></figure>
+      <figure><img src="thumb.jpg" width="960" height="600" alt="裝在驅動模組上的十字滑塊聯軸器：TT 馬達、馬達端輪轂、紅色滑塊、軸端輪轂、11 齒小齒輪">
+        <figcaption>圖 3　裝在驅動模組上：黃色 TT 馬達 → 馬達端輪轂 → 紅色滑塊 → 軸端輪轂 → 11 齒小齒輪（差速器輸入）。</figcaption></figure>
       <div class="tablewrap"><table>
         <thead><tr><th>項目</th><th>數值</th></tr></thead>
         <tbody>
@@ -170,7 +170,7 @@ P = e·cos φ · (cos φ, sin φ) = ( e/2 + (e/2)·cos 2φ ,  (e/2)·sin 2φ )
         </tbody>
       </table></div>
     </div>
-    <p class="callout">e = 12 mm 對十字滑塊來說偏大，但 TT 馬達輸出只有約 200 rpm，滑塊離心力只有約 0.015 N，振動不是問題；主要注意凸條和槽的摩擦，必要時點潤滑油。完整設計、組裝動畫與列印檔：<a href="/3dp-portfolio/works/car-model.html">3D 列印作品集 · 差速轉向車</a>。為什麼不用萬向接頭：<a href="../ujoint/">萬向接頭 §7</a>。</p>
+    <p class="callout">e = 12 mm 對十字滑塊來說偏大，但 TT 馬達輸出只有約 200 rpm，滑塊離心力只有約 0.015 N，振動不是問題；主要注意凸條和槽的摩擦，必要時點潤滑油。完整設計、3D 組裝與運轉動畫、列印檔：<a href="/3dp-portfolio/works/oldham-drive.html">3D 列印作品集 · 差速器＋十字滑塊聯軸器＋TT 馬達</a>（這組原本是為差速轉向車設計的後軸驅動；整車還在修改中、不一定採用十字滑塊，所以獨立成一個作品）。為什麼不用萬向接頭：<a href="../ujoint/">萬向接頭 §7</a>。</p>
   </section>
 
   <section>
@@ -183,7 +183,7 @@ P = e·cos φ · (cos φ, sin φ) = ( e/2 + (e/2)·cos 2φ ,  (e/2)·sin 2φ )
     </ul>
   </section>
 
-  <footer>MechanicalAI · 機構學 / 剛性傳動 / 十字滑塊聯軸器 · 圖 1～3 由差速轉向車的 build123d 模型渲染；互動模擬即時計算</footer>
+  <footer>MechanicalAI · 機構學 / 剛性傳動 / 十字滑塊聯軸器 · 圖 1～3 由驅動模組的 build123d 模型渲染；互動模擬即時計算</footer>
 </main>
 
 <script>
