@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>聯軸器種類與選用 · MechanicalAI</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<style>
+section { display: grid; gap: 12px; }
+main.wrap > *, section > * { min-width: 0; }
+.prose { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.prose li::marker { color: var(--blue); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+.mis { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 12px; }
+figure { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+figure svg { display: block; width: 100%; height: auto; background: var(--deep); border-radius: 8px; }
+figcaption { color: var(--muted); font-size: .86rem; margin-top: 8px; }
+figcaption b { color: var(--fg); }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { background: var(--deep); color: var(--muted); font-weight: 600; white-space: nowrap; }
+td:first-child { white-space: nowrap; }
+td .en { display: block; color: var(--muted); font-size: .8em; }
+tr:last-child td { border-bottom: 0; }
+td.c { text-align: center; white-space: nowrap; }
+.no { color: #fca5a5; } .lo { color: #fde68a; } .mid { color: #fdba74; } .hi { color: #86efac; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: .82rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <nav class="crumbs" aria-label="導覽"><a href="../../">MechanicalAI</a><span>/</span><a href="../">機構學</a><span>/</span><a href="../rigid/">剛性傳動</a><span>/</span><span>聯軸器種類與選用</span></nav>
+
+  <header class="hero">
+    <span class="eyebrow">Shaft Couplings</span>
+    <h1>聯軸器種類與選用</h1>
+    <p class="lead">聯軸器（Coupling）把馬達軸和負載軸接在一起傳遞扭力。選哪一種，主要看兩軸之間有哪一種偏差、偏差多大，以及需不需要等速、無背隙。</p>
+  </header>
+
+  <section>
+    <h2 class="sec">1. 兩軸的三種偏差</h2>
+    <div class="mis">
+      <figure><svg viewBox="0 0 240 120" role="img" aria-label="徑向偏移：兩軸平行但上下錯開 e">
+        <rect x="14" y="40" width="96" height="16" rx="3" fill="#475569"/><rect x="130" y="64" width="96" height="16" rx="3" fill="#3b82f6"/>
+        <path d="M8 48 H232" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 4"/><path d="M8 72 H232" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 4"/>
+        <path d="M120 50 V70" stroke="#fb923c" stroke-width="2"/><path d="M116 50 H124 M116 70 H124" stroke="#fb923c" stroke-width="2"/>
+        <text x="128" y="60" fill="#fdba74" font-size="13" font-family="sans-serif">e</text></svg>
+        <figcaption><b>徑向偏移</b>（Parallel / Radial Offset）：兩軸平行但錯開距離 e。十字滑塊最擅長。</figcaption></figure>
+      <figure><svg viewBox="0 0 240 120" role="img" aria-label="角度偏差：兩軸交於一點夾角 β">
+        <rect x="14" y="62" width="104" height="16" rx="3" fill="#475569"/>
+        <g transform="rotate(-22 120 70)"><rect x="122" y="62" width="104" height="16" rx="3" fill="#3b82f6"/></g>
+        <path d="M120 70 H232" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 4"/>
+        <path d="M200 70 A80 80 0 0 0 194.2 40" fill="none" stroke="#fb923c" stroke-width="2"/>
+        <text x="206" y="58" fill="#fdba74" font-size="13" font-family="sans-serif">β</text><circle cx="120" cy="70" r="3" fill="#fde68a"/></svg>
+        <figcaption><b>角度偏差</b>（Angular Misalignment）：兩軸交在一點、夾角 β。萬向接頭最擅長。</figcaption></figure>
+      <figure><svg viewBox="0 0 240 120" role="img" aria-label="軸向位移：兩軸同心但前後間距變化 Δ">
+        <rect x="14" y="52" width="96" height="16" rx="3" fill="#475569"/><rect x="134" y="52" width="92" height="16" rx="3" fill="#3b82f6"/>
+        <path d="M8 60 H232" stroke="#94a3b8" stroke-width="1" stroke-dasharray="5 4"/>
+        <path d="M110 86 H134" stroke="#fb923c" stroke-width="2"/><path d="M110 80 V92 M134 80 V92" stroke="#fb923c" stroke-width="2"/>
+        <text x="116" y="106" fill="#fdba74" font-size="13" font-family="sans-serif">Δ</text></svg>
+        <figcaption><b>軸向位移</b>（Axial / End Float）：兩軸同心但距離會變，例如熱膨脹、懸吊上下跳動。需要可滑動的花鍵或彈性元件。</figcaption></figure>
+    </div>
+    <p class="callout">實際機器三種偏差通常同時存在。<strong>剛性聯軸器</strong>完全不能補償，強行鎖上會讓軸承承受很大的額外負荷；<strong>撓性（可移式）聯軸器</strong>才允許偏差。注意：教科書的聯軸器分類裡，十字滑塊、萬向接頭屬於「撓性聯軸器」，因為它們允許兩軸相對移動；本站把它們放在「剛性傳動」，是因為零件本身都是剛體，和皮帶、鏈條這種「撓性運動」相對。</p>
+  </section>
+
+  <section>
+    <h2 class="sec">2. 種類比較</h2>
+    <div class="legend"><span><span class="no">✕</span> 不能</span><span><span class="lo">小</span> 少量（約零點幾 mm／1° 內）</span><span><span class="mid">中</span> 中等</span><span><span class="hi">大</span> 主要用途</span><span>實際容許值依尺寸與型錄而定</span></div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>種類</th><th>構造</th><th>徑向</th><th>角度</th><th>軸向</th><th>等速</th><th>特性</th><th>典型用途</th></tr></thead>
+      <tbody>
+        <tr><td>套筒聯軸器<span class="en">Sleeve / Rigid</span></td><td>一根管子＋定位螺絲或鍵</td><td class="c no">✕</td><td class="c no">✕</td><td class="c no">✕</td><td class="c hi">是</td><td>最簡單、無背隙、最剛</td><td>同心度有保證的短軸、LEGO 軸接頭</td></tr>
+        <tr><td>凸緣聯軸器<span class="en">Flange</span></td><td>兩片凸緣用螺栓鎖在一起</td><td class="c no">✕</td><td class="c no">✕</td><td class="c no">✕</td><td class="c hi">是</td><td>可傳大扭力、拆裝方便</td><td>泵浦、大型傳動軸</td></tr>
+        <tr><td>爪式／梅花<span class="en">Jaw / Spider</span></td><td>兩個爪形輪轂夾一片彈性墊</td><td class="c lo">小</td><td class="c lo">小</td><td class="c lo">小</td><td class="c hi">是*</td><td>吸震、電氣絕緣；彈性墊磨耗後要換</td><td>馬達接泵浦、風扇、一般伺服</td></tr>
+        <tr><td>十字滑塊<span class="en">Oldham</span></td><td>兩個開槽輪轂＋中間十字凸條滑塊</td><td class="c hi">大</td><td class="c lo">小</td><td class="c lo">小</td><td class="c hi">是</td><td>滑塊偏心公轉會振動、需潤滑；滑塊可當過載保險件</td><td>3D 印表機 Z 軸、平行錯開的兩軸；<a href="../oldham/" style="color:var(--blue-soft)">詳解</a></td></tr>
+        <tr><td>萬向接頭（單個）<span class="en">Hooke / Cardan</span></td><td>兩個叉子＋十字軸</td><td class="c no">✕</td><td class="c hi">大</td><td class="c no">✕</td><td class="c no">否</td><td>每轉忽快忽慢兩次，夾角越大越明顯</td><td>方向盤轉向柱、工具萬向頭；<a href="../ujoint/" style="color:var(--blue-soft)">詳解</a></td></tr>
+        <tr><td>雙萬向接頭<span class="en">Double Cardan</span></td><td>兩個萬向接頭＋中間軸（常加滑動花鍵）</td><td class="c hi">大</td><td class="c hi">大</td><td class="c mid">中*</td><td class="c hi">是**</td><td>排列正確才等速；需要長度</td><td>後輪驅動車傳動軸、農機動力輸出軸</td></tr>
+        <tr><td>等速接頭<span class="en">CV（Rzeppa / Tripod）</span></td><td>球籠＋鋼珠，或三叉＋滾子</td><td class="c no">✕</td><td class="c hi">大</td><td class="c mid">三叉式可</td><td class="c hi">是</td><td>大角度仍等速、要防塵套和潤滑脂</td><td>前輪驅動車半軸</td></tr>
+        <tr><td>齒式聯軸器<span class="en">Gear Coupling</span></td><td>外齒輪轂套進內齒套筒</td><td class="c lo">小</td><td class="c lo">小</td><td class="c mid">中</td><td class="c hi">是</td><td>體積小、扭力最大，要油潤滑</td><td>軋鋼機、大型壓縮機</td></tr>
+        <tr><td>波紋管／膜片<span class="en">Bellows / Disc</span></td><td>薄金屬波紋管或疊片</td><td class="c lo">小</td><td class="c lo">小</td><td class="c lo">小</td><td class="c hi">是</td><td>無背隙、扭轉剛性高</td><td>編碼器、伺服定位、CNC 進給</td></tr>
+        <tr><td>螺旋梁<span class="en">Beam / Helical</span></td><td>一段金屬切出螺旋槽</td><td class="c lo">小</td><td class="c mid">中</td><td class="c lo">小</td><td class="c hi">是*</td><td>無背隙、便宜；扭力大時會扭轉變形</td><td>步進馬達接導螺桿、編碼器</td></tr>
+      </tbody>
+    </table></div>
+    <p style="margin:0; color: var(--muted); font-size: .85rem">* 彈性元件受扭會有一點角度落後，但平均轉速相同；雙萬向的軸向位移靠中間軸的滑動花鍵。** 兩端夾角相等、中間軸兩端叉子在同一平面時才等速。</p>
+  </section>
+
+  <section>
+    <h2 class="sec">3. 選用流程</h2>
+    <ol class="prose">
+      <li><strong>先量偏差</strong>：兩軸是同心、平行錯開、還是夾角？偏差固定還是會變（例如懸吊上下跳）？</li>
+      <li><strong>同心且固定</strong> → 套筒或凸緣剛性聯軸器；要吸震、怕對心不準 → 爪式／梅花</li>
+      <li><strong>平行錯開幾 mm 以上</strong> → 十字滑塊（低轉速）；或用雙萬向 Z 型（需要長度）；錯開很多時改用齒輪、皮帶</li>
+      <li><strong>有夾角</strong> → 萬向接頭；在意轉速波動 → 雙萬向或等速接頭；夾角超過約 30° → 等速接頭</li>
+      <li><strong>精密定位</strong>（編碼器、導螺桿）→ 波紋管、膜片、螺旋梁這類無背隙聯軸器</li>
+      <li>最後核對：<strong>額定扭力</strong>（含啟動衝擊）、<strong>最高轉速</strong>、軸徑與固定方式（定位螺絲、夾緊、鍵、D 形孔）</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2 class="sec">4. 3D 列印與 LEGO 小車的建議</h2>
+    <ul class="prose">
+      <li><strong>TT 馬達接 LEGO 十字軸、兩軸同心</strong>：一個印的套筒就夠，一端 D 形孔、一端十字孔（十字孔每邊留約 0.15 mm 間隙）</li>
+      <li><strong>兩軸平行錯開</strong>：十字滑塊最好印——三件都是平面加直槽，可平放或立著印、不用支撐；凸條和槽之間留 <strong>0.2～0.3 mm</strong> 間隙，點一點潤滑油</li>
+      <li><strong>兩軸有夾角</strong>：LEGO Technic 有現成的萬向接頭零件；夾角大時記得單個接頭會忽快忽慢，車子行走時可能會「一頓一頓」</li>
+      <li>空間不夠放聯軸器時，也可以改用<strong>一對正齒輪</strong>把動力移到另一根軸上，同時順便減速</li>
+    </ul>
+    <p class="callout">實例：<a href="/3dp-portfolio/works/car-model.html">差速轉向車</a>的 TT 馬達和差速器輸入軸平行錯開 12 mm、中間只有 21 mm 空間——雙萬向接頭放不下，所以用了自印的<a href="../oldham/">十字滑塊聯軸器</a>。</p>
+  </section>
+
+  <footer>MechanicalAI · 機構學 / 剛性傳動 / 聯軸器種類與選用 · 表中「小／中／大」為相對比較，實際容許偏差請查各廠型錄</footer>
+</main>
+</body>
+</html>

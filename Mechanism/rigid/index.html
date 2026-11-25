@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>剛性傳動 · MechanicalAI</title>
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<main class="wrap">
+  <nav class="crumbs" aria-label="導覽"><a href="../../">MechanicalAI</a><span>/</span><a href="../">機構學</a><span>/</span><span>剛性傳動</span></nav>
+
+  <header class="hero cat-hero">
+    <div class="cat-icon" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M6 60 H34" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/><path d="M50 44 H36 V76 H50" fill="none" stroke="#fb923c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><g transform="rotate(-24 52 60)"><path d="M55 49 H69 V71 H55" fill="none" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M70 60 H95" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/></g><path d="M52 43 V77" stroke="#fde68a" stroke-width="5" stroke-linecap="round"/><circle cx="52" cy="60" r="5" fill="#07111e" stroke="#fde68a" stroke-width="3"/></svg></div>
+    <div class="hero">
+      <span class="eyebrow">Rigid Shaft Drives · Couplings</span>
+      <h1>剛性傳動</h1>
+      <p class="lead">用剛性零件把一根軸的轉動直接傳到另一根軸：聯軸器、萬向接頭都屬於這一類。兩根軸實際上很難完全對準，所以選用時要看它能補償哪一種偏差、能不能維持等速。</p>
+    </div>
+  </header>
+
+  <section>
+    <h2 class="sec">常見種類</h2>
+    <ul class="kinds">
+      <li><strong>剛性聯軸器</strong><span class="en">（Rigid Coupling：套筒 Sleeve、凸緣 Flange）</span>：兩軸鎖成一體，最簡單、沒有背隙，但兩軸必須精確對心；<a href="../couplings/">聯軸器種類與選用 →</a></li>
+      <li><strong>爪式／梅花聯軸器</strong><span class="en">（Jaw / Spider Coupling）</span>：兩個爪形輪轂中間夾彈性墊，可吸震、容許少量偏差</li>
+      <li><strong>十字滑塊聯軸器</strong><span class="en">（Oldham Coupling）</span>：中間滑塊兩面各有一條互相垂直的凸條，補償兩軸<strong>平行偏移</strong>，轉速完全 1:1；<a href="../oldham/">原理與互動模擬 →</a></li>
+      <li><strong>萬向接頭</strong><span class="en">（Universal Joint / Hooke's Joint）</span>：十字軸加兩個叉子，兩軸可以<strong>夾一個角度</strong>，但單個接頭的輸出轉速會忽快忽慢；<a href="../ujoint/">不等速分析與互動模擬 →</a></li>
+      <li><strong>等速萬向接頭</strong><span class="en">（CV Joint：球籠式 Rzeppa、三叉式 Tripod）</span>：大角度也能等速，前輪驅動車的半軸都用它；<a href="../ujoint/#cv">介紹 →</a></li>
+      <li><strong>精密撓性聯軸器</strong><span class="en">（Bellows、Beam、Disc）</span>：靠金屬本身微量彎曲補償偏差，沒有背隙，用在編碼器、步進馬達接導螺桿</li>
+    </ul>
+  </section>
+
+  <p class="callout"><strong>兩軸的三種偏差</strong>：<strong>徑向偏移</strong>（兩軸平行但錯開）、<strong>角度偏差</strong>（兩軸夾一個角）、<strong>軸向位移</strong>（前後竄動）。十字滑塊專門處理徑向偏移，萬向接頭專門處理角度偏差；兩者都只靠剛性零件滑動或轉動，不像皮帶、鏈條那樣靠零件本身彎曲（見<a href="../flexible/">撓性運動</a>）。</p>
+
+  <section>
+    <h2 class="sec">生活中的應用</h2>
+    <div class="meta"><span class="tag">汽車傳動軸</span><span class="tag">前驅車半軸</span><span class="tag">方向盤轉向柱</span><span class="tag">3D 印表機 Z 軸</span><span class="tag">渦卷式壓縮機</span><span class="tag">套筒扳手萬向頭</span><span class="tag">馬達接泵浦</span></div>
+  </section>
+
+  <section>
+    <h2 class="sec">主題與模型</h2>
+    <div class="grid">
+    <a class="card" href="../couplings/">
+      <div class="media" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M6 50 H30 M70 50 H94" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/><rect x="26" y="30" width="18" height="40" rx="3" fill="#fb923c"/><rect x="56" y="30" width="18" height="40" rx="3" fill="#3b82f6"/><rect x="44" y="32" width="12" height="36" rx="2" fill="#4ade80"/><path d="M44 32 H50 V44 H44 Z M44 56 H50 V68 H44 Z" fill="#fb923c"/><path d="M50 44 H56 V56 H50 Z" fill="#3b82f6"/></svg></div>
+      <div class="body">
+        <h2>聯軸器種類與選用<span class="en">Coupling Selection</span></h2>
+        <ul>
+          <li>三種偏差：徑向、角度、軸向（示意圖）</li>
+          <li>10 種聯軸器比較表：能補償什麼、是否等速、有無背隙</li>
+          <li>選用流程與 3D 列印／LEGO 小車建議</li>
+        </ul>
+        <div class="meta"><span class="tag">比較表</span><span class="tag">選用流程</span></div>
+        <span class="go">閱讀 →</span>
+      </div>
+    </a>
+
+    <a class="card" href="../ujoint/">
+      <div class="media" aria-hidden="true"><svg viewBox="0 0 100 100"><path d="M6 60 H34" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/><path d="M50 44 H36 V76 H50" fill="none" stroke="#fb923c" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><g transform="rotate(-24 52 60)"><path d="M55 49 H69 V71 H55" fill="none" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><path d="M70 60 H95" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/></g><path d="M52 43 V77" stroke="#fde68a" stroke-width="5" stroke-linecap="round"/><circle cx="52" cy="60" r="5" fill="#07111e" stroke="#fde68a" stroke-width="3"/></svg></div>
+      <div class="body">
+        <h2>萬向接頭<span class="en">Universal Joint</span></h2>
+        <ul>
+          <li>不等速公式：<strong>ω₂/ω₁ = cos β ÷ (1 − sin²β cos²θ₁)</strong></li>
+          <li>雙萬向接頭怎麼排才會抵消（Z 型、W 型）</li>
+          <li>等速接頭：球籠式、三叉式；互動 3D 模擬可調夾角</li>
+        </ul>
+        <div class="meta"><span class="tag">Hooke's Joint</span><span class="tag">Double Cardan</span><span class="tag">互動模擬</span></div>
+        <span class="go">閱讀分析 →</span>
+      </div>
+    </a>
+
+    <a class="card" href="../oldham/">
+      <div class="media" aria-hidden="true"><svg viewBox="0 0 100 100"><circle cx="42" cy="52" r="30" fill="#131f2e" stroke="#94a3b8" stroke-width="3"/><circle cx="58" cy="52" r="30" fill="none" stroke="#3b82f6" stroke-width="3" stroke-dasharray="6 4"/><circle cx="50" cy="52" r="8" fill="none" stroke="#fde68a" stroke-width="1.5" stroke-dasharray="2 2"/><g transform="rotate(20 56.1 57.1)"><rect x="44.1" y="45.1" width="24" height="24" rx="2" fill="#f87171"/><path d="M56.1 39 V76" stroke="#fde68a" stroke-width="5"/><path d="M37.6 57.1 H74.6" stroke="#fb923c" stroke-width="5"/></g><circle cx="42" cy="52" r="3" fill="#e2e8f0"/><circle cx="58" cy="52" r="3" fill="#93c5fd"/></svg></div>
+      <div class="body">
+        <h2>十字滑塊聯軸器<span class="en">Oldham Coupling</span></h2>
+        <ul>
+          <li>泰勒斯定理：滑塊中心沿<strong>以偏移量為直徑的圓</strong>、以 <strong>2 倍轉速</strong>公轉</li>
+          <li>為什麼轉速永遠 1:1；滑動行程、離心力與設計要點</li>
+          <li>互動模擬可調偏移量與轉速</li>
+        </ul>
+        <div class="meta"><span class="tag">平行偏移</span><span class="tag">等速 1:1</span><span class="tag">互動模擬</span></div>
+        <span class="go">閱讀分析 →</span>
+      </div>
+    </a>
+
+    <a class="card" href="/3dp-portfolio/works/car-model.html">
+      <div class="media"><img src="../oldham/thumb.jpg" width="960" height="600" alt="差速轉向車的十字滑塊聯軸器：TT 馬達、馬達端輪轂、紅色滑塊、軸端輪轂與 11 齒小齒輪"></div>
+      <div class="body">
+        <h2>模型：差速轉向車的十字滑塊聯軸器<span class="en">3D Printed</span></h2>
+        <ul>
+          <li>TT 馬達軸和差速器輸入軸平行錯開 <strong>12 mm</strong></li>
+          <li>3 件自印：D 孔輪轂、方形滑塊、十字孔輪轂；總長 21.7 mm、Ø40</li>
+          <li>組裝動畫與全車列印檔在 3D 列印作品集</li>
+        </ul>
+        <div class="meta"><span class="tag">3D 列印</span><span class="tag">LEGO Technic</span><span class="tag">TT 馬達</span></div>
+        <span class="go">開啟作品頁 ↗</span>
+      </div>
+    </a>
+    </div>
+  </section>
+
+  <footer>MechanicalAI · 機構學 / 剛性傳動</footer>
+</main>
+</body>
+</html>

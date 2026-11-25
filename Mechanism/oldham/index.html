@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>十字滑塊聯軸器 · MechanicalAI</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<style>
+/* Theory sections, exploded renders of the car's coupling, a front-view simulator (slots, slider, Thales circle) and a slide chart. */
+section { display: grid; gap: 12px; }
+main.wrap > *, section > *, .sim > * { min-width: 0; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+.prose { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.prose li::marker { color: var(--blue); }
+.formula { background: var(--deep); border: 1px solid rgba(59,130,246,.35); color: #7dd3fc; border-radius: 10px;
+  padding: 10px 14px; font-family: var(--mono); font-size: .92rem; overflow-x: auto; white-space: pre; margin: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+figure { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+figure img, figure svg { display: block; width: 100%; height: auto; border-radius: 8px; }
+figure svg { background: var(--deep); }
+figcaption { color: var(--muted); font-size: .86rem; margin-top: 6px; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; }
+th { background: var(--deep); color: var(--muted); font-weight: 600; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+.pc { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 760px) { .pc { grid-template-columns: 1fr; } }
+.pc h3 { margin: 0 0 6px; font-size: 1rem; }
+.pc .good li::marker { color: #86efac; } .pc .bad li::marker { color: #fca5a5; }
+/* simulator */
+.sim { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .sim { grid-template-columns: 1fr; } }
+.sim svg { width: 100%; height: auto; background: var(--deep); border: 1px solid var(--line); border-radius: 10px; display: block; }
+.ctrl { display: grid; gap: 10px; }
+.slider { display: grid; grid-template-columns: 6.5em 1fr 4.6em; gap: 8px; align-items: center; font-size: .9rem; }
+.slider input { width: 100%; accent-color: var(--blue); }
+.slider output { font-family: var(--mono); text-align: right; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn { border: 1px solid var(--line); background: var(--deep); color: var(--fg); border-radius: 8px; padding: 5px 10px; font: inherit; font-size: .85rem; cursor: pointer; }
+.btn:hover { border-color: var(--blue); }
+.btn[aria-pressed="true"] { border-color: var(--orange); color: #fdba74; }
+.btn:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.readout div { background: var(--deep); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; min-width: 0; }
+.readout b { display: block; color: var(--muted); font-size: .75rem; font-weight: 600; }
+.readout output { font-family: var(--mono); font-size: 1rem; font-variant-numeric: tabular-nums; }
+.key { display: flex; flex-wrap: wrap; gap: 10px; font-size: .8rem; color: var(--muted); }
+.key i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 4px; }
+@media (max-width: 520px) { .readout { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <nav class="crumbs" aria-label="導覽"><a href="../../">MechanicalAI</a><span>/</span><a href="../">機構學</a><span>/</span><a href="../rigid/">剛性傳動</a><span>/</span><span>十字滑塊聯軸器</span></nav>
+
+  <header class="hero">
+    <span class="eyebrow">Oldham Coupling</span>
+    <h1>十字滑塊聯軸器</h1>
+    <p class="lead">兩根平行但錯開的軸，用一個兩面各有凸條的滑塊連起來：滑塊一邊轉一邊滑，兩軸轉速永遠完全相同。本頁用泰勒斯定理說明滑塊怎麼動，並以差速轉向車上自印的聯軸器為例。</p>
+  </header>
+
+  <section>
+    <h2 class="sec">1. 構造</h2>
+    <div class="two">
+      <figure><img src="exploded_a.jpg" width="960" height="600" alt="十字滑塊聯軸器爆炸圖：左邊輪轂前面有一道直槽，中間滑塊前面是直立凸條、後面是橫向凸條，右邊輪轂">
+        <figcaption>圖 1　左：馬達端輪轂與它的直槽；中：滑塊（前面直立凸條、後面橫向凸條）；右：軸端輪轂背面的十字孔。</figcaption></figure>
+      <figure><img src="exploded_b.jpg" width="960" height="600" alt="從另一側看：馬達端輪轂的 D 形孔、滑塊、軸端輪轂前面的橫槽">
+        <figcaption>圖 2　另一側：馬達端輪轂的 D 形孔，軸端輪轂前面的<strong>橫槽</strong>正對滑塊的橫向凸條。</figcaption></figure>
+    </div>
+    <ul class="prose">
+      <li><strong>輸入輪轂</strong>：固定在第一根軸上，面向滑塊的一面有一道<strong>直槽</strong></li>
+      <li><strong>中間滑塊</strong>（Slider / Center Disc）：兩面各一條凸條（Tongue），<strong>兩條凸條互相垂直</strong></li>
+      <li><strong>輸出輪轂</strong>：固定在第二根軸上，有一道和第一道垂直的槽</li>
+      <li>滑塊沒有固定在任何軸上，它可以沿第一道槽滑、也可以沿第二道槽滑——這兩個自由度剛好吸收兩軸的平行偏移</li>
+      <li>1820 年代由愛爾蘭工程師 John Oldham 發明，用在蒸汽船的槳輪軸</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="sec">2. 運動原理：泰勒斯定理</h2>
+    <ul class="prose">
+      <li>從軸向看，輸入軸心 O₁、輸出軸心 O₂ 相距 e（偏移量）。滑塊中心 P 一定同時在兩條直線上：
+        <strong>過 O₁、沿第一道槽</strong>的直線，以及<strong>過 O₂、沿第二道槽</strong>的直線</li>
+      <li>兩條凸條互相垂直，所以這兩條直線永遠互相垂直 → ∠O₁PO₂ = 90°</li>
+      <li><strong>泰勒斯定理</strong>（Thales' Theorem）：看直徑兩端成直角的點都在圓上 → P 永遠在<strong>以 O₁O₂ 為直徑的圓</strong>上</li>
+    </ul>
+    <div class="formula">取 O₁ = (0, 0)、O₂ = (e, 0)，輸入轉角 φ：
+
+P = e·cos φ · (cos φ, sin φ) = ( e/2 + (e/2)·cos 2φ ,  (e/2)·sin 2φ )
+
+→ 滑塊中心繞圓心 (e/2, 0)、半徑 e/2 公轉，轉角 2φ（輸入轉一圈，滑塊公轉兩圈）</div>
+    <ul class="prose">
+      <li><strong>為什麼一定是 1:1</strong>：滑塊是剛體，它的兩條凸條固定相差 90°；輸入槽跟著第一條凸條、輸出槽跟著第二條，所以兩個輪轂的轉角永遠相等，<strong>沒有任何瞬間速度差</strong>（這點和單個萬向接頭不同）</li>
+      <li><strong>凸條在槽裡的滑動</strong>：第一條凸條離 O₁ 的距離 = e·cos φ，第二條離 O₂ 的距離 = e·sin φ；每條每轉來回一次，總滑動距離 <strong>4e</strong>，最大滑動速度 <strong>e·ω</strong></li>
+      <li><strong>離心力</strong>：滑塊質量 m 以半徑 e/2、角速度 2ω 公轉 → F = m·(e/2)·(2ω)² = <strong>2·m·e·ω²</strong>，和轉速平方成正比，這就是高速時會振動的原因</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="sec">3. 互動模擬（軸向視圖）</h2>
+    <div class="sim">
+      <div style="display:grid; gap:10px">
+        <svg id="sim-front" viewBox="0 0 480 360" role="img" aria-label="十字滑塊聯軸器軸向視圖動畫"></svg>
+        <svg id="sim-chart" viewBox="0 0 480 200" role="img" aria-label="兩條凸條在槽中的位置對輸入角的曲線"></svg>
+      </div>
+      <div class="ctrl">
+        <div class="key"><span><i style="background:#3b82f6"></i>輸入輪轂與直槽（後）</span><span><i style="background:#fb923c"></i>輸出輪轂與橫槽（前）</span><span><i style="background:#f87171"></i>滑塊</span><span><i style="background:#fde68a"></i>滑塊中心軌跡</span></div>
+        <div class="slider"><label for="s-e">偏移量 e</label><input id="s-e" type="range" min="0" max="20" step="0.5" value="12"><output id="o-e">12 mm</output></div>
+        <div class="slider"><label for="s-n">轉速</label><input id="s-n" type="range" min="10" max="3000" step="10" value="200"><output id="o-n">200 rpm</output></div>
+        <div class="presets"><button class="btn" id="play" aria-pressed="true">暫停</button><button class="btn" id="slow" aria-pressed="false">慢動作</button><button class="btn" id="car">差速轉向車（e = 12 mm、200 rpm）</button></div>
+        <div class="readout">
+          <div><b>輸入角 φ</b><output id="r-in">—</output></div>
+          <div><b>輸出角</b><output id="r-out">—</output></div>
+          <div><b>滑塊公轉角 2φ</b><output id="r-orb">—</output></div>
+          <div><b>凸條 1 位置</b><output id="r-s1">—</output></div>
+          <div><b>凸條 2 位置</b><output id="r-s2">—</output></div>
+          <div><b>最大滑動速度</b><output id="r-v">—</output></div>
+          <div><b>滑塊公轉</b><output id="r-orbn">—</output></div>
+          <div><b>離心力（1.4 g 滑塊）</b><output id="r-f">—</output></div>
+          <div><b>速度比</b><output>1.000</output></div>
+        </div>
+        <p style="margin:0; color: var(--muted); font-size: .85rem">畫面以輪轂 Ø40、凸條長 15 mm（差速轉向車的尺寸）繪製；動畫轉速固定放慢，數值以設定轉速計算。白線 O₁P、O₂P 永遠垂直，所以 P 一直在黃色圓上。1.4 g 是 PLA 實心滑塊的估計重量。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">4. 優缺點與設計要點</h2>
+    <div class="pc">
+      <div class="panel good"><h3>優點</h3><ul class="prose">
+        <li><strong>等速 1:1</strong>，沒有萬向接頭那種轉速波動</li>
+        <li>可補償<strong>較大的平行偏移</strong>，而且軸向很短</li>
+        <li>構造簡單，三件都是平面加直槽，<strong>容易 3D 列印</strong>、不用支撐</li>
+        <li>中間滑塊可用塑膠做成<strong>過載保險件</strong>（卡死時先壞滑塊），也能電氣絕緣</li>
+      </ul></div>
+      <div class="panel bad"><h3>缺點</h3><ul class="prose">
+        <li>滑塊偏心公轉，<strong>偏移大、轉速高時會振動</strong></li>
+        <li>凸條在槽裡一直滑，有摩擦損失和磨耗，需要潤滑</li>
+        <li>幾乎<strong>不能補償角度偏差</strong>，兩軸要盡量平行</li>
+        <li>凸條和槽的間隙造成少許<strong>背隙</strong>，不適合精密定位</li>
+      </ul></div>
+    </div>
+    <ul class="prose">
+      <li><strong>凸條長度</strong>：凸條滑到最遠時（離軸心 e）還要整條留在槽內：若槽貫穿輪轂，需 <strong>L/2 + e ≤ 輪轂半徑</strong></li>
+      <li><strong>間隙</strong>：FDM 列印時凸條每邊留 <strong>0.15～0.3 mm</strong>，太緊會卡、太鬆會晃</li>
+      <li><strong>兩道槽在不同面</strong>：一個輪轂的槽在背面、另一個在正面，滑塊夾在中間，兩輪轂之間各留 0.3 mm 左右</li>
+      <li><strong>偏移量</strong>：一般盡量小；偏移越大，滑動距離（4e）、摩擦和離心力都跟著變大</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="sec">5. 實例：差速轉向車的聯軸器</h2>
+    <div class="two">
+      <figure><img src="thumb.jpg" width="960" height="600" alt="裝在車上的十字滑塊聯軸器：TT 馬達、馬達端輪轂、紅色滑塊、軸端輪轂、11 齒小齒輪">
+        <figcaption>圖 3　裝在車上：黃色 TT 馬達 → 馬達端輪轂 → 紅色滑塊 → 軸端輪轂 → 11 齒小齒輪（差速器輸入）。</figcaption></figure>
+      <div class="tablewrap"><table>
+        <thead><tr><th>項目</th><th>數值</th></tr></thead>
+        <tbody>
+          <tr><td>偏移量 e</td><td><strong>12 mm</strong>（TT 馬達置中後，馬達軸在中線左邊 12 mm）</td></tr>
+          <tr><td>可用長度</td><td>馬達前端到小齒輪軸承塔 21 mm</td></tr>
+          <tr><td>總長／外徑</td><td><strong>21.7 mm／Ø40</strong></td></tr>
+          <tr><td>馬達端輪轂</td><td>D 形孔套 TT 馬達軸，背面直槽 5.3 寬 × 2.8 深</td></tr>
+          <tr><td>滑塊</td><td>16 × 16 × 3 方形，兩條凸條 5 × 2.5 × 15，可立著印</td></tr>
+          <tr><td>軸端輪轂</td><td>十字孔套 LEGO 2L 軸，正面橫槽</td></tr>
+          <tr><td>凸條長度檢查</td><td>15/2 + 12 = 19.5 ≤ 20（輪轂半徑）✓</td></tr>
+          <tr><td>轉動檢查</td><td>每 15° 一步轉一整圈：無碰撞，凸條始終在槽內</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <p class="callout">e = 12 mm 對十字滑塊來說偏大，但 TT 馬達輸出只有約 200 rpm，滑塊離心力只有約 0.015 N，振動不是問題；主要注意凸條和槽的摩擦，必要時點潤滑油。完整設計、組裝動畫與列印檔：<a href="/3dp-portfolio/works/car-model.html">3D 列印作品集 · 差速轉向車</a>。為什麼不用萬向接頭：<a href="../ujoint/">萬向接頭 §7</a>。</p>
+  </section>
+
+  <section>
+    <h2 class="sec">6. 其他應用</h2>
+    <ul class="prose">
+      <li><strong>3D 印表機 Z 軸</strong>：步進馬達接導螺桿，吸收導螺桿的微小偏擺，避免列印件表面出現週期性紋路（Z-wobble）</li>
+      <li><strong>渦卷式壓縮機</strong>（Scroll Compressor）：冷氣壓縮機裡的「十字環」（Oldham Ring）讓動渦盤只能平移公轉、不能自轉</li>
+      <li><strong>送紙滾輪、印刷機</strong>：滾輪位置要能調整，兩軸距離會變</li>
+      <li>小型泵浦、計量設備：偏移小、轉速中低、需要電氣絕緣的場合</li>
+    </ul>
+  </section>
+
+  <footer>MechanicalAI · 機構學 / 剛性傳動 / 十字滑塊聯軸器 · 圖 1～3 由差速轉向車的 build123d 模型渲染；互動模擬即時計算</footer>
+</main>
+
+<script>
+(() => {
+  "use strict";
+  const D2R = Math.PI / 180, R2D = 180 / Math.PI, TAU = 2 * Math.PI;
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  const HUB_R = 20, SLOT_W = 5.3, TONGUE_L = 15, TONGUE_W = 5, BODY = 16, K = 6.2;  // mm, px per mm
+  const front = document.getElementById("sim-front"), chart = document.getElementById("sim-chart");
+  const se = document.getElementById("s-e"), sn = document.getElementById("s-n");
+  const out = id => document.getElementById(id);
+  let e = 12, phi = 0.4, playing = true, slow = false, last = null;
+
+  // a rectangle centred at (cx, cy) with length along angle a (radians, math sense), as an SVG polygon in screen px
+  const W0 = 240, H0 = 185;
+  const S = (x, y) => [W0 + K * x, H0 - K * y];
+  function rect(cx, cy, len, wid, a, attrs, parent) {
+    const c = Math.cos(a), s = Math.sin(a), pts = [];
+    for (const [u, v] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) { const x = cx + u * len / 2 * c - v * wid / 2 * s, y = cy + u * len / 2 * s + v * wid / 2 * c; pts.push(S(x, y).map(n => n.toFixed(1)).join(",")); }
+    return el("polygon", Object.assign({ points: pts.join(" ") }, attrs), parent);
+  }
+
+  function drawFront() {
+    front.textContent = "";
+    const o1 = [-e / 2, 0], o2 = [e / 2, 0];
+    const defs = el("defs", {}, front);
+    for (const [id, o] of [["h1", o1], ["h2", o2]]) { const cp = el("clipPath", { id }, defs); const c = S(o[0], o[1]); el("circle", { cx: c[0], cy: c[1], r: K * HUB_R }, cp); }
+    // input hub (behind) with its slot along phi
+    let c1 = S(o1[0], o1[1]);
+    el("circle", { cx: c1[0], cy: c1[1], r: K * HUB_R, fill: "#10233f", stroke: "#3b82f6", "stroke-width": 2 }, front);
+    const g1 = el("g", { "clip-path": "url(#h1)" }, front);
+    rect(o1[0], o1[1], 2 * HUB_R + 4, SLOT_W, phi, { fill: "#07111e", stroke: "#3b82f6", "stroke-width": 1, "stroke-opacity": 0.6 }, g1);
+    // output hub (front) translucent, slot along phi + 90
+    let c2 = S(o2[0], o2[1]);
+    el("circle", { cx: c2[0], cy: c2[1], r: K * HUB_R, fill: "#fb923c", "fill-opacity": 0.07, stroke: "#fb923c", "stroke-width": 2, "stroke-dasharray": "7 5" }, front);
+    const g2 = el("g", { "clip-path": "url(#h2)" }, front);
+    rect(o2[0], o2[1], 2 * HUB_R + 4, SLOT_W, phi + Math.PI / 2, { fill: "#fb923c", "fill-opacity": 0.12, stroke: "#fb923c", "stroke-width": 1, "stroke-opacity": 0.7 }, g2);
+    // rim markers: same angle on both hubs
+    for (const [o, col] of [[o1, "#93c5fd"], [o2, "#fdba74"]]) { const m = S(o[0] + (HUB_R - 3) * Math.cos(phi + Math.PI / 2 + 0.6), o[1] + (HUB_R - 3) * Math.sin(phi + Math.PI / 2 + 0.6)); el("circle", { cx: m[0], cy: m[1], r: 5, fill: col }, front); }
+    // Thales circle and the slider centre
+    const P = [o1[0] + e * Math.cos(phi) * Math.cos(phi), o1[1] + e * Math.cos(phi) * Math.sin(phi)];
+    // slider: body, tongue 1 along phi (into the input slot), tongue 2 along phi + 90 (into the output slot)
+    rect(P[0], P[1], BODY, BODY, phi, { fill: "#f87171", "fill-opacity": 0.6, stroke: "#fecaca", "stroke-width": 1.2 }, front);
+    rect(P[0], P[1], TONGUE_L, TONGUE_W, phi, { fill: "none", stroke: "#93c5fd", "stroke-width": 2, "stroke-dasharray": "4 3" }, front);
+    rect(P[0], P[1], TONGUE_L, TONGUE_W, phi + Math.PI / 2, { fill: "#fdba74", "fill-opacity": 0.55, stroke: "#fb923c", "stroke-width": 2 }, front);
+    const mc = S(0, 0);
+    if (e > 0) el("circle", { cx: mc[0], cy: mc[1], r: K * e / 2, fill: "none", stroke: "#fde68a", "stroke-width": 2, "stroke-dasharray": "4 4" }, front);
+    // right angle O1-P-O2
+    const p = S(P[0], P[1]);
+    if (e > 0) {
+      el("line", { x1: c1[0], y1: c1[1], x2: p[0], y2: p[1], stroke: "#e2e8f0", "stroke-width": 1.5 }, front);
+      el("line", { x1: c2[0], y1: c2[1], x2: p[0], y2: p[1], stroke: "#e2e8f0", "stroke-width": 1.5 }, front);
+      const u = [Math.cos(phi), Math.sin(phi)], v = [-Math.sin(phi), Math.cos(phi)], q = 2.2;
+      const d1 = Math.sign((o1[0] - P[0]) * u[0] + (o1[1] - P[1]) * u[1]) || 1, d2 = Math.sign((o2[0] - P[0]) * v[0] + (o2[1] - P[1]) * v[1]) || 1;
+      const a = S(P[0] + d1 * q * u[0], P[1] + d1 * q * u[1]), b = S(P[0] + d1 * q * u[0] + d2 * q * v[0], P[1] + d1 * q * u[1] + d2 * q * v[1]), cc = S(P[0] + d2 * q * v[0], P[1] + d2 * q * v[1]);
+      el("path", { d: `M${a[0]} ${a[1]} L${b[0]} ${b[1]} L${cc[0]} ${cc[1]}`, fill: "none", stroke: "#e2e8f0", "stroke-width": 1.2 }, front);
+    }
+    el("circle", { cx: p[0], cy: p[1], r: 4.5, fill: "#fde68a" }, front);
+    el("circle", { cx: c1[0], cy: c1[1], r: 4, fill: "#93c5fd" }, front);
+    el("circle", { cx: c2[0], cy: c2[1], r: 4, fill: "#fdba74" }, front);
+    const t = (x, y, s, col, anchor) => { el("text", { x, y, fill: col, "font-size": 14, "font-family": "sans-serif", "text-anchor": anchor || "middle", stroke: "#07111e", "stroke-width": 4, "paint-order": "stroke" }, front).textContent = s; };
+    t(c1[0] - 8, c1[1] + 22, "O₁", "#93c5fd", "end"); t(c2[0] + 8, c2[1] + 22, "O₂", "#fdba74", "start"); t(p[0] + 10, p[1] - 10, "P", "#fde68a", "start");
+    t(12, 22, "輸入輪轂（後）", "#93c5fd", "start"); t(468, 22, "輸出輪轂（前）", "#fdba74", "end");
+    t(240, 350, "e = " + e.toFixed(1) + " mm", "#94a3b8");
+    return P;
+  }
+
+  function drawChart() {
+    chart.textContent = "";
+    const W = 480, H = 200, L = 46, R = 14, T = 26, B = 32, M = 20;
+    const xs = a => L + (W - L - R) * a / TAU, ys = v => T + (H - T - B) * (M - v) / (2 * M);
+    for (const d of [0, 90, 180, 270, 360]) { const x = xs(d * D2R); el("line", { x1: x, y1: T, x2: x, y2: H - B, stroke: "#1c2a3c" }, chart);
+      el("text", { x, y: H - B + 17, fill: "#94a3b8", "font-size": 12, "text-anchor": "middle", "font-family": "sans-serif" }, chart).textContent = d + "°"; }
+    for (const v of [-20, -10, 0, 10, 20]) { const y = ys(v); el("line", { x1: L, y1: y, x2: W - R, y2: y, stroke: v === 0 ? "#2d3f55" : "#1c2a3c" }, chart);
+      el("text", { x: L - 6, y: y + 4, fill: "#94a3b8", "font-size": 12, "text-anchor": "end", "font-family": "sans-serif" }, chart).textContent = v; }
+    const path = f => { const pts = []; for (let i = 0; i <= 120; i++) { const a = TAU * i / 120; pts.push(xs(a).toFixed(1) + " " + ys(f(a)).toFixed(1)); } return "M" + pts.join(" L"); };
+    el("path", { d: path(a => e * Math.cos(a)), fill: "none", stroke: "#93c5fd", "stroke-width": 2.2 }, chart);
+    el("path", { d: path(a => e * Math.sin(a)), fill: "none", stroke: "#fdba74", "stroke-width": 2.2 }, chart);
+    const a = ((phi % TAU) + TAU) % TAU;
+    el("line", { x1: xs(a), y1: T, x2: xs(a), y2: H - B, stroke: "#e2e8f0", "stroke-width": 1, "stroke-dasharray": "4 3" }, chart);
+    el("circle", { cx: xs(a), cy: ys(e * Math.cos(a)), r: 4.5, fill: "#93c5fd" }, chart);
+    el("circle", { cx: xs(a), cy: ys(e * Math.sin(a)), r: 4.5, fill: "#fdba74" }, chart);
+    el("text", { x: L, y: 16, fill: "#e2e8f0", "font-size": 12, "font-family": "sans-serif" }, chart).textContent = "凸條在槽中的位置（mm）：藍 = 凸條 1（e cos φ）、橘 = 凸條 2（e sin φ）";
+  }
+
+  function frame() {
+    drawFront(); drawChart();
+    const deg = a => (((a * R2D) % 360) + 360) % 360, n = +sn.value, w = n / 60 * TAU;
+    out("r-in").textContent = deg(phi).toFixed(1) + "°";
+    out("r-out").textContent = deg(phi).toFixed(1) + "°";
+    out("r-orb").textContent = deg(2 * phi).toFixed(1) + "°";
+    out("r-s1").textContent = (e * Math.cos(phi)).toFixed(1) + " mm";
+    out("r-s2").textContent = (e * Math.sin(phi)).toFixed(1) + " mm";
+    out("r-v").textContent = (e / 1000 * w).toFixed(3) + " m/s";
+    out("r-orbn").textContent = (2 * n) + " rpm";
+    const F = 0.0014 * (e / 2000) * (2 * w) ** 2;
+    out("r-f").textContent = F < 0.1 ? F.toFixed(3) + " N" : F.toFixed(2) + " N";
+  }
+
+  function tick(ts) {
+    if (last !== null && playing) phi += (ts - last) / 1000 * TAU / (slow ? 16 : 5);
+    last = ts; frame(); requestAnimationFrame(tick);
+  }
+  se.addEventListener("input", () => { e = +se.value; out("o-e").textContent = e + " mm"; frame(); });
+  sn.addEventListener("input", () => { out("o-n").textContent = sn.value + " rpm"; frame(); });
+  const play = out("play"), slowB = out("slow");
+  play.addEventListener("click", () => { playing = !playing; play.textContent = playing ? "暫停" : "播放"; play.setAttribute("aria-pressed", playing ? "true" : "false"); });
+  slowB.addEventListener("click", () => { slow = !slow; slowB.setAttribute("aria-pressed", slow ? "true" : "false"); });
+  out("car").addEventListener("click", () => { se.value = 12; sn.value = 200; e = 12; out("o-e").textContent = "12 mm"; out("o-n").textContent = "200 rpm"; frame(); });
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { playing = false; play.textContent = "播放"; play.setAttribute("aria-pressed", "false"); }
+  frame(); requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

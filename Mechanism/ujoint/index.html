@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>萬向接頭 · MechanicalAI</title>
+<link rel="stylesheet" href="../../assets/site.css">
+<style>
+/* Theory sections, a 3D-projected universal joint drawn in SVG (same solver for figure and simulator), a speed-ratio chart. */
+section { display: grid; gap: 12px; }
+main.wrap > *, section > *, .sim > * { min-width: 0; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+.prose { margin: 0; padding-left: 1.3em; display: grid; gap: 6px; }
+.prose li::marker { color: var(--blue); }
+.formula { background: var(--deep); border: 1px solid rgba(59,130,246,.35); color: #7dd3fc; border-radius: 10px;
+  padding: 10px 14px; font-family: var(--mono); font-size: .92rem; overflow-x: auto; white-space: pre; margin: 0; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+figure { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+figure svg { display: block; width: 100%; height: auto; background: var(--deep); border-radius: 8px; }
+figcaption { color: var(--muted); font-size: .86rem; margin-top: 6px; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; font-variant-numeric: tabular-nums; }
+th, td { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+th { background: var(--deep); color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+.figs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 12px; }
+/* simulator */
+.sim { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 860px) { .sim { grid-template-columns: 1fr; } }
+.sim svg { width: 100%; height: auto; background: var(--deep); border: 1px solid var(--line); border-radius: 10px; display: block; }
+.ctrl { display: grid; gap: 10px; }
+.slider { display: grid; grid-template-columns: 6.5em 1fr 4.8em; gap: 8px; align-items: center; font-size: .9rem; }
+.slider input { width: 100%; accent-color: var(--blue); }
+.slider output { font-family: var(--mono); text-align: right; }
+.presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn { border: 1px solid var(--line); background: var(--deep); color: var(--fg); border-radius: 8px; padding: 5px 10px; font: inherit; font-size: .85rem; cursor: pointer; }
+.btn:hover { border-color: var(--blue); }
+.btn[aria-pressed="true"] { border-color: var(--orange); color: #fdba74; }
+.btn:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.verdict { border-radius: 10px; padding: 10px 14px; background: #0f2040; border: 1px solid rgba(59,130,246,.3); font-size: .92rem; }
+.verdict b { font-size: 1.05rem; }
+.readout { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.readout div { background: var(--deep); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; min-width: 0; }
+.readout b { display: block; color: var(--muted); font-size: .75rem; font-weight: 600; }
+.readout output { font-family: var(--mono); font-size: 1rem; font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) { .readout { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <nav class="crumbs" aria-label="導覽"><a href="../../">MechanicalAI</a><span>/</span><a href="../">機構學</a><span>/</span><a href="../rigid/">剛性傳動</a><span>/</span><span>萬向接頭</span></nav>
+
+  <header class="hero">
+    <span class="eyebrow">Universal Joint · Hooke's Joint</span>
+    <h1>萬向接頭</h1>
+    <p class="lead">萬向接頭讓兩根夾一個角度的軸可以一起轉。構造只有兩個叉子和一個十字軸，但單個接頭的輸出轉速會忽快忽慢；本頁推導這個不等速關係，說明怎麼用兩個接頭互相抵消，並介紹汽車半軸用的等速接頭。</p>
+  </header>
+
+  <section>
+    <h2 class="sec">1. 構造</h2>
+    <div class="two">
+      <figure><svg id="fig-parts" viewBox="0 0 520 300" role="img" aria-label="萬向接頭構造：輸入軸、輸入叉、十字軸、輸出叉、輸出軸，兩軸夾角 β"></svg>
+        <figcaption>圖 1　十字軸的一對軸頸裝在輸入叉、另一對裝在輸出叉，兩對互相垂直。兩軸夾角為 β。</figcaption></figure>
+      <ul class="prose">
+        <li><strong>輸入叉、輸出叉</strong>（Yoke）：分別固定在兩根軸上，叉口各夾住十字軸的一對軸頸</li>
+        <li><strong>十字軸</strong>（Cross / Spider）：四個軸頸互相垂直，通常套滾針軸承（Needle Bearing）</li>
+        <li>兩軸中心線<strong>交在十字軸中心</strong>，夾角 β 可以在轉動中改變（例如懸吊上下跳）</li>
+        <li>又稱<strong>虎克接頭</strong>（Hooke's Joint）或<strong>卡登接頭</strong>（Cardan Joint），十六、十七世紀就有記載</li>
+        <li>它只能處理<strong>角度偏差</strong>；兩軸平行錯開時要用兩個接頭（Z 型），或改用<a href="../oldham/" style="color:var(--blue-soft)">十字滑塊聯軸器</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">2. 為什麼不等速</h2>
+    <ul class="prose">
+      <li>輸入叉的軸頸一定在<strong>垂直輸入軸</strong>的平面上繞圈，輸出叉的軸頸一定在<strong>垂直輸出軸</strong>的平面上繞圈；兩個平面夾 β 角</li>
+      <li>十字軸兩對軸頸永遠互相垂直，把一個平面上的等角轉動「投影」到另一個傾斜的平面，角度就被拉伸或壓縮了</li>
+      <li>θ₁ 從「輸入叉軸頸落在兩軸所在平面」的位置量起，可推得：</li>
+    </ul>
+    <div class="formula">tan θ₂ = tan θ₁ / cos β
+
+ω₂ / ω₁ = cos β / (1 − sin²β · cos²θ₁)
+
+最大 ω₂/ω₁ = 1 / cos β    （θ₁ = 0°、180°）
+最小 ω₂/ω₁ = cos β        （θ₁ = 90°、270°）
+最大角度差 θ₂ − θ₁ = atan[ (1 − cos β) / (2 √cos β) ]</div>
+    <ul class="prose">
+      <li>兩軸<strong>平均轉速相同</strong>（轉一圈還是一圈），但輸出軸每轉<strong>加速兩次、減速兩次</strong></li>
+      <li>波動和 β 不是線性關係：小角度幾乎看不出來，超過 20° 以後快速變大</li>
+    </ul>
+    <div class="tablewrap"><table>
+      <thead><tr><th>夾角 β</th><th>最大 ω₂/ω₁</th><th>最小 ω₂/ω₁</th><th>轉速波動（最大 − 最小）</th><th>最大角度差</th></tr></thead>
+      <tbody>
+        <tr><td>5°</td><td>1.004</td><td>0.996</td><td>0.8 %</td><td>0.11°</td></tr>
+        <tr><td>10°</td><td>1.015</td><td>0.985</td><td>3.1 %</td><td>0.44°</td></tr>
+        <tr><td>20°</td><td>1.064</td><td>0.940</td><td>12.4 %</td><td>1.78°</td></tr>
+        <tr><td>30°</td><td>1.155</td><td>0.866</td><td><strong>28.9 %</strong></td><td>4.12°</td></tr>
+        <tr><td>45°</td><td>1.414</td><td>0.707</td><td><strong>70.7 %</strong></td><td>9.88°</td></tr>
+      </tbody>
+    </table></div>
+    <div class="panel">
+      <b>推導要點</b>
+      <ul class="prose" style="margin-top:6px">
+        <li>輸入軸沿 x，輸出軸方向 a₂ = (cos β, sin β, 0)。輸入叉軸頸方向 u₁ = (0, cos θ₁, sin θ₁)</li>
+        <li>輸出叉軸頸 v₂ 要同時垂直 u₁（十字軸）和 a₂（輸出軸），所以 v₂ ∥ a₂ × u₁ = (sin β sin θ₁, −cos β sin θ₁, cos β cos θ₁)</li>
+        <li>把 v₂ 寫在輸出軸自己的座標裡，得到輸出叉轉角滿足 tan θ₂ = tan θ₁ / cos β；對時間微分就是上面的速度比</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">3. 互動模擬</h2>
+    <div class="sim">
+      <div style="display:grid; gap:10px">
+        <svg id="sim-mech" viewBox="0 0 560 330" role="img" aria-label="萬向接頭 3D 動畫"></svg>
+        <svg id="sim-chart" viewBox="0 0 560 230" role="img" aria-label="輸出與輸入角速度比對輸入角的曲線"></svg>
+      </div>
+      <div class="ctrl">
+        <div class="presets" id="modes" aria-label="接頭配置">
+          <button class="btn" data-mode="single" aria-pressed="true">單個萬向接頭</button>
+          <button class="btn" data-mode="z0" aria-pressed="false">雙萬向（叉子同平面）</button>
+          <button class="btn" data-mode="z90" aria-pressed="false">雙萬向（叉子錯 90°）</button>
+        </div>
+        <div class="slider"><label for="s-b">夾角 β</label><input id="s-b" type="range" min="0" max="45" step="1" value="30"><output id="o-b">30°</output></div>
+        <div class="slider"><label for="s-v">轉速</label><input id="s-v" type="range" min="2" max="30" step="1" value="10"><output id="o-v">10 rpm</output></div>
+        <div class="verdict" id="verdict" aria-live="polite"></div>
+        <div class="readout">
+          <div><b>輸入角 θ₁</b><output id="r-in">—</output></div>
+          <div><b>輸出角</b><output id="r-out">—</output></div>
+          <div><b>角度差</b><output id="r-err">—</output></div>
+          <div><b>速度比 ω₂/ω₁</b><output id="r-w">—</output></div>
+          <div><b>最大／最小</b><output id="r-mm">—</output></div>
+          <div><b>轉速波動</b><output id="r-fl">—</output></div>
+        </div>
+        <div class="presets"><button class="btn" id="play" aria-pressed="true">暫停</button></div>
+        <p style="margin:0; color: var(--muted); font-size: .85rem">軸端的短指針標出各軸目前轉到哪裡。雙萬向模式是 Z 型：輸出軸和輸入軸平行、錯開一段距離，兩個接頭夾角都是 β。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">4. 雙萬向接頭：讓不等速互相抵消</h2>
+    <div class="figs">
+      <figure><svg viewBox="0 0 300 140" role="img" aria-label="Z 型配置：輸入與輸出軸平行">
+        <path d="M14 104 H96" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/><path d="M96 104 L204 40" stroke="#a78bfa" stroke-width="8" stroke-linecap="round"/><path d="M204 40 H286" stroke="#93c5fd" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="96" cy="104" r="7" fill="#07111e" stroke="#fde68a" stroke-width="3"/><circle cx="204" cy="40" r="7" fill="#07111e" stroke="#fde68a" stroke-width="3"/>
+        <path d="M136 104 A40 40 0 0 0 130.4 83.6" fill="none" stroke="#fb923c" stroke-width="2"/><text x="140" y="96" fill="#fdba74" font-size="13" font-family="sans-serif">β</text>
+        <path d="M164 40 A40 40 0 0 0 169.6 60.4" fill="none" stroke="#fb923c" stroke-width="2"/><text x="168" y="58" fill="#fdba74" font-size="13" font-family="sans-serif">β</text>
+        <path d="M96 104 H140 M204 40 H160" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/></svg>
+        <figcaption><b>Z 型</b>：輸入、輸出軸平行錯開，例如後驅車的傳動軸。</figcaption></figure>
+      <figure><svg viewBox="0 0 300 140" role="img" aria-label="W 型配置：輸入與輸出軸相交">
+        <path d="M14 46 L96 96" stroke="#94a3b8" stroke-width="8" stroke-linecap="round"/><path d="M96 96 H204" stroke="#a78bfa" stroke-width="8" stroke-linecap="round"/><path d="M204 96 L286 46" stroke="#93c5fd" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="96" cy="96" r="7" fill="#07111e" stroke="#fde68a" stroke-width="3"/><circle cx="204" cy="96" r="7" fill="#07111e" stroke="#fde68a" stroke-width="3"/>
+        <path d="M136 96 A40 40 0 0 1 130.1 116.8" fill="none" stroke="#fb923c" stroke-width="2"/><text x="118" y="110" fill="#fdba74" font-size="13" font-family="sans-serif">β</text>
+        <path d="M164 96 A40 40 0 0 0 169.9 116.8" fill="none" stroke="#fb923c" stroke-width="2"/><text x="174" y="110" fill="#fdba74" font-size="13" font-family="sans-serif">β</text>
+        <path d="M96 96 L136 120 M204 96 L164 120" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/></svg>
+        <figcaption><b>W 型</b>：輸入、輸出軸延長後相交，兩個接頭夾角一樣大。</figcaption></figure>
+    </div>
+    <ol class="prose">
+      <li><strong>兩個接頭的夾角相等</strong>（β₁ = β₂）</li>
+      <li><strong>中間軸兩端的叉子在同一平面</strong>（同相，In Phase）：第一個接頭造成的加速，剛好被第二個接頭的減速抵消</li>
+      <li><strong>三根軸在同一平面</strong>上（Z 型或 W 型）</li>
+    </ol>
+    <p class="callout">只要其中一條不成立，就不是等速。最常見的錯誤是中間軸<strong>叉子裝錯 90°</strong>：波動不但沒抵消，反而<strong>加倍</strong>（在模擬裡切到「叉子錯 90°」就看得到）。所以傳動軸的滑動花鍵通常有對位記號，拆裝時要對齊。</p>
+  </section>
+
+  <section id="cv">
+    <h2 class="sec">5. 等速萬向接頭（CV Joint）</h2>
+    <div class="two">
+      <figure><svg viewBox="0 0 320 220" role="img" aria-label="等速原理：傳力點落在兩軸夾角的平分面上，到兩軸距離相等">
+        <path d="M20 150 H160" stroke="#94a3b8" stroke-width="10" stroke-linecap="round"/>
+        <path d="M160 150 L290 75" stroke="#93c5fd" stroke-width="10" stroke-linecap="round"/>
+        <path d="M160 150 L135.4 58.2" stroke="#fde68a" stroke-width="1.5" stroke-dasharray="5 4"/><path d="M160 150 L178.6 219.5" stroke="#fde68a" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <path d="M147.8 104.6 L147.8 150" stroke="#fb923c" stroke-width="2"/><path d="M147.8 104.6 L170.5 143.9" stroke="#fb923c" stroke-width="2"/>
+        <circle cx="147.8" cy="104.6" r="8" fill="#f87171"/>
+        <text x="134" y="134" fill="#fdba74" font-size="13" font-family="sans-serif">r</text><text x="164" y="120" fill="#fdba74" font-size="13" font-family="sans-serif">r</text>
+        <text x="100" y="54" fill="#fde68a" font-size="12" font-family="sans-serif">平分面</text>
+        <text x="24" y="138" fill="#94a3b8" font-size="12" font-family="sans-serif">輸入軸</text><text x="238" y="72" fill="#93c5fd" font-size="12" font-family="sans-serif">輸出軸</text></svg>
+        <figcaption>圖 2　傳力點（紅色鋼珠）只要一直在兩軸夾角的平分面上，到兩軸的距離 r 就相等，兩軸的角速度必然相同。</figcaption></figure>
+      <ul class="prose">
+        <li><strong>等速原理</strong>：兩軸靠接觸點互推，接觸點的線速度對兩軸一樣；若接觸點到兩軸的距離也一樣，角速度就一樣。所以只要讓所有傳力點都落在<strong>夾角平分面</strong>上</li>
+        <li><strong>球籠式</strong>（Rzeppa / Ball-Type）：內外圈各有 6 條溝，鋼珠由保持架（Cage）帶著，始終留在平分面上；角度可到約 45° 以上，用在前驅車半軸的<strong>車輪端</strong></li>
+        <li><strong>三叉式</strong>（Tripod）：三叉軸上的滾子在殼體溝槽裡滑動，<strong>可以軸向伸縮</strong>但角度較小，用在半軸的<strong>變速箱端</strong></li>
+        <li><strong>雙萬向（Double Cardan）</strong>：把兩個十字軸接頭做在一起、中間用定心機構維持兩邊角度相等，四輪傳動車的前傳動軸常用</li>
+        <li>CV 接頭裡面有潤滑脂、外面包橡膠<strong>防塵套</strong>；防塵套破了進沙，接頭很快會磨壞（轉彎時「喀喀」響）</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec">6. 應用與注意事項</h2>
+    <ul class="prose">
+      <li><strong>後輪驅動車傳動軸</strong>：Z 型雙萬向＋滑動花鍵，同時處理角度和懸吊上下跳造成的長度變化</li>
+      <li><strong>方向盤轉向柱</strong>：轉向柱和轉向機不在一直線，常用一到兩個萬向接頭繞過引擎室的東西</li>
+      <li><strong>工具</strong>：套筒扳手的萬向頭、電鑽的彎角延長桿</li>
+      <li>單個萬向接頭的工作夾角一般<strong>不超過約 30°</strong>：角度越大，轉速波動、軸承負荷和磨耗都越大</li>
+      <li>夾角 0° 也不理想：滾針軸承完全不擺動，會一直壓在同一位置而壓出凹痕；工業傳動軸通常保留一點點角度</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="sec">7. 實例：差速轉向車為什麼沒用萬向接頭</h2>
+    <ul class="prose">
+      <li>TT 馬達軸和差速器輸入軸<strong>平行錯開 12 mm</strong>，平行偏移只能用<strong>兩個</strong>萬向接頭排成 Z 型</li>
+      <li>若每個接頭夾角取 30°，中間軸至少要 12 ÷ sin 30° = <strong>24 mm</strong>，再加上兩端叉子，總長約 <strong>40 mm</strong></li>
+      <li>但馬達前端到小齒輪軸承塔只有 <strong>21 mm</strong>；夾角加大能縮短長度，卻讓轉速波動更大</li>
+      <li>最後改用總長 21.7 mm 的<a href="../oldham/" style="color:var(--blue-soft)">十字滑塊聯軸器</a>：專門處理平行偏移，而且轉速完全 1:1</li>
+    </ul>
+  </section>
+
+  <footer>MechanicalAI · 機構學 / 剛性傳動 / 萬向接頭 · 圖 1 與互動模擬由頁面內同一套向量求解程式即時計算</footer>
+</main>
+
+<script>
+(() => {
+  "use strict";
+  const D2R = Math.PI / 180, R2D = 180 / Math.PI, TAU = 2 * Math.PI;
+  const C = { shaft: "#64748b", shaftOut: "#5b8bd6", in: "#fb923c", out: "#3b82f6", mid: "#a78bfa", cross: "#fde68a",
+              fg: "#e2e8f0", muted: "#94a3b8", grid: "#1c2a3c", line: "#2d3f55" };
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+
+  // vectors
+  const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+  const mul = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const norm = a => { const l = Math.hypot(a[0], a[1], a[2]); return mul(a, 1 / l); };
+  const rot = (v, k, t) => { const c = Math.cos(t), s = Math.sin(t), kv = cross(k, v), kd = dot(k, v);
+    return [0, 1, 2].map(i => v[i] * c + kv[i] * s + k[i] * kd * (1 - c)); };
+  const angleAbout = (v, axis, ref) => Math.atan2(dot(v, cross(axis, ref)), dot(v, ref));
+  const wrap = a => { a = (a + Math.PI) % TAU; if (a < 0) a += TAU; return a - Math.PI; };
+
+  // kinematics. Input shaft along +x into the joint at the origin; output (or middle) shaft along a2 in the xy plane.
+  // mode: "single" | "z0" (middle yokes in one plane) | "z90" (middle yokes 90 deg apart). Z layout: output parallel to input.
+  const X = [1, 0, 0], Y0 = [0, 1, 0];
+  function solve(th, beta, mode) {
+    const a2 = [Math.cos(beta), Math.sin(beta), 0];
+    const u1 = rot(Y0, X, th), v2 = norm(cross(a2, u1));
+    const v20 = norm(cross(a2, Y0));
+    if (mode === "single") return { a2, u1, v2, out: angleAbout(v2, a2, v20) };
+    const ph = mode === "z90" ? Math.PI / 2 : 0;
+    const p = rot(v2, a2, ph), q = norm(cross(X, p));
+    const q0 = norm(cross(X, rot(v20, a2, ph)));
+    return { a2, u1, v2, p, q, out: angleAbout(q, X, q0) };
+  }
+  const ratio = (th, beta, mode) => { const h = 1e-4; return wrap(solve(th + h, beta, mode).out - solve(th - h, beta, mode).out) / (2 * h); };
+
+  // drawing: orthographic view, yaw about y then pitch about x
+  const YAW = 38 * D2R, PITCH = 22 * D2R;
+  const proj = p => { const cy = Math.cos(YAW), sy = Math.sin(YAW), cp = Math.cos(PITCH), sp = Math.sin(PITCH);
+    const x = p[0] * cy + p[2] * sy, z = -p[0] * sy + p[2] * cy, y = p[1];
+    return [x, -(y * cp - z * sp), y * sp + z * cp]; };
+  const R = 1, DF = 1.25, MID = 5.2;
+  let LS = 3.0;  // fork radius, fork depth, shaft length, middle shaft length (between joints)
+
+  function segments(th, beta, mode) {
+    const s = solve(th, beta, mode), segs = [], lab = {};
+    const seg = (a, b, w, col) => segs.push({ a, b, w, col });
+    const yoke = (J, dir, pin, col) => { const B = add(J, mul(dir, DF));
+      seg(add(B, mul(pin, R)), add(B, mul(pin, -R)), 0.26, col);
+      seg(add(B, mul(pin, R)), add(J, mul(pin, R)), 0.22, col);
+      seg(add(B, mul(pin, -R)), add(J, mul(pin, -R)), 0.22, col); return B; };
+    const crossAt = (J, p, q) => { seg(add(J, mul(p, -R)), add(J, mul(p, R)), 0.17, C.cross); seg(add(J, mul(q, -R)), add(J, mul(q, R)), 0.17, C.cross); };
+    const shaft = (J, dir, len, col, pin, pcol) => { const a = add(J, mul(dir, DF)), b = add(J, mul(dir, DF + len));
+      seg(a, b, 0.38, col); seg(b, add(b, mul(pin, 0.75)), 0.12, pcol); return b; };
+    const J1 = [0, 0, 0], mX = mul(X, -1);
+    lab.inShaft = shaft(J1, mX, LS, C.shaft, s.u1, C.in);
+    lab.inYoke = yoke(J1, mX, s.u1, C.in);
+    crossAt(J1, s.u1, s.v2);
+    lab.cross = [0.9, -1.9, 0];
+    if (mode === "single") {
+      lab.outYoke = yoke(J1, s.a2, s.v2, C.out);
+      lab.outShaft = shaft(J1, s.a2, LS, C.shaftOut, s.v2, C.out);
+    } else {
+      const J2 = mul(s.a2, MID);
+      yoke(J1, s.a2, s.v2, C.mid);
+      seg(mul(s.a2, DF), add(J2, mul(s.a2, -DF)), 0.34, C.mid);
+      yoke(J2, mul(s.a2, -1), s.p, C.mid);
+      crossAt(J2, s.p, s.q);
+      lab.outYoke = yoke(J2, X, s.q, C.out);
+      lab.outShaft = shaft(J2, X, LS, C.shaftOut, s.q, C.out);
+    }
+    return { segs, lab, s };
+  }
+
+  function fit(beta, mode, W, H, m, ths) {
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    for (const th of ths || [0, 0.8, 1.6, 2.4]) for (const sg of segments(th, beta, mode).segs) for (const p of [sg.a, sg.b]) {
+      const q = proj(p); x0 = Math.min(x0, q[0]); x1 = Math.max(x1, q[0]); y0 = Math.min(y0, q[1]); y1 = Math.max(y1, q[1]); }
+    const k = Math.min((W - 2 * m) / (x1 - x0 + 0.6), (H - 2 * m) / (y1 - y0 + 0.6));
+    return { k, cx: W / 2 - k * (x0 + x1) / 2, cy: H / 2 - k * (y0 + y1) / 2 };
+  }
+
+  function draw(svg, th, beta, mode, view, labels) {
+    svg.textContent = "";
+    const { segs, lab, s } = segments(th, beta, mode);
+    const P = p => { const q = proj(p); return [view.cx + view.k * q[0], view.cy + view.k * q[1], q[2]]; };
+    const list = segs.map(sg => { const a = P(sg.a), b = P(sg.b); return { a, b, z: (a[2] + b[2]) / 2, sg }; }).sort((u, v) => u.z - v.z);
+    // the bend plane, faint
+    for (const it of list) {
+      el("line", { x1: it.a[0], y1: it.a[1], x2: it.b[0], y2: it.b[1], stroke: "#07111e", "stroke-width": it.sg.w * view.k + 3, "stroke-linecap": "round" }, svg);
+      el("line", { x1: it.a[0], y1: it.a[1], x2: it.b[0], y2: it.b[1], stroke: it.sg.col, "stroke-width": it.sg.w * view.k, "stroke-linecap": "round" }, svg);
+    }
+    const c = P([0, 0, 0]); el("circle", { cx: c[0], cy: c[1], r: 0.2 * view.k, fill: "#07111e", stroke: C.cross, "stroke-width": 2 }, svg);
+    if (labels) {
+      const t = (p, txt, dx, dy, col) => { const q = P(p); el("text", { x: q[0] + dx, y: q[1] + dy, fill: col || C.fg, "font-size": 15, "font-family": "sans-serif", "text-anchor": "middle" }, svg).textContent = txt; };
+      t(lab.inShaft, "輸入軸", 10, 36, C.muted);
+      t(lab.inYoke, "輸入叉", -6, 66, "#fdba74");
+      t(lab.cross, "十字軸", 0, 0, C.cross);
+      t(lab.outYoke, "輸出叉", 70, 44, "#93c5fd");
+      t(lab.outShaft, "輸出軸", -34, -22, "#93c5fd");
+      // beta arc in the bend plane (xy)
+      const pts = []; for (let i = 0; i <= 12; i++) { const a = beta * i / 12; pts.push(P([2.6 * Math.cos(a), 2.6 * Math.sin(a), 0])); }
+      el("path", { d: "M" + pts.map(p => p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" L"), fill: "none", stroke: "#fb923c", "stroke-width": 2 }, svg);
+      const e0 = P([4.2, 0, 0]); el("line", { x1: c[0], y1: c[1], x2: e0[0], y2: e0[1], stroke: C.muted, "stroke-width": 1.2, "stroke-dasharray": "5 4" }, svg);
+      const bl = P([3.0 * Math.cos(beta / 2), 3.0 * Math.sin(beta / 2), 0]);
+      el("text", { x: bl[0] + 8, y: bl[1] + 4, fill: "#fdba74", "font-size": 16, "font-family": "sans-serif" }, svg).textContent = "β";
+    }
+    return s;
+  }
+
+  // figure 1
+  const figBeta = 25 * D2R, fig = document.getElementById("fig-parts");
+  LS = 2.0;
+  draw(fig, 35 * D2R, figBeta, "single", fit(figBeta, "single", 520, 300, 40, [35 * D2R]), true);
+  LS = 2.6;
+
+  // simulator
+  const mech = document.getElementById("sim-mech"), chart = document.getElementById("sim-chart");
+  const sb = document.getElementById("s-b"), sv = document.getElementById("s-v");
+  const out = id => document.getElementById(id);
+  let mode = "single", beta = 30 * D2R, th = 0.3, playing = true, view = null, curve = null, last = null;
+
+  function rebuild() {
+    view = fit(Math.max(beta, 20 * D2R), mode, 560, 330, 18);
+    const N = 240, pts = [];
+    for (let i = 0; i <= N; i++) { const t = TAU * i / N; pts.push([t, ratio(t, beta, mode)]); }
+    let lo = Infinity, hi = -Infinity; for (const p of pts) { lo = Math.min(lo, p[1]); hi = Math.max(hi, p[1]); }
+    curve = { pts, lo, hi, ymin: Math.min(0.9, lo - 0.06), ymax: Math.max(1.1, hi + 0.06) };
+    out("r-mm").textContent = hi.toFixed(3) + " / " + lo.toFixed(3);
+    out("r-fl").textContent = ((hi - lo) * 100).toFixed(1) + " %";
+    const v = out("verdict");
+    if (beta < 1e-6) v.innerHTML = "<b>β = 0°：兩軸同一直線</b><br>完全等速。";
+    else if (mode === "single") v.innerHTML = "<b>單個萬向接頭：不等速</b><br>輸出軸每轉加速、減速各兩次，最大是輸入的 " + hi.toFixed(3) + " 倍、最小 " + lo.toFixed(3) + " 倍。";
+    else if (mode === "z0") v.innerHTML = "<b>雙萬向、叉子同平面：等速</b><br>第一個接頭的加速被第二個接頭的減速抵消，輸出和輸入轉速完全相同（中間軸本身仍忽快忽慢）。";
+    else v.innerHTML = "<b>雙萬向、叉子錯 90°：波動加倍</b><br>兩個接頭的波動同時加速、同時減速，比單個接頭更糟（最大 " + hi.toFixed(3) + "、最小 " + lo.toFixed(3) + "）。";
+  }
+
+  function drawChart() {
+    chart.textContent = "";
+    const W = 560, H = 230, L = 52, Rr = 14, T = 16, B = 36;
+    const xs = t => L + (W - L - Rr) * t / TAU, ys = r => T + (H - T - B) * (curve.ymax - r) / (curve.ymax - curve.ymin);
+    for (const d of [0, 90, 180, 270, 360]) {
+      const x = xs(d * D2R); el("line", { x1: x, y1: T, x2: x, y2: H - B, stroke: C.grid }, chart);
+      el("text", { x, y: H - B + 18, fill: C.muted, "font-size": 12, "text-anchor": "middle", "font-family": "sans-serif" }, chart).textContent = d + "°";
+    }
+    const step = (curve.ymax - curve.ymin) > 0.6 ? 0.2 : 0.1;
+    for (let r = Math.ceil(curve.ymin / step) * step; r <= curve.ymax + 1e-9; r += step) {
+      const y = ys(r); el("line", { x1: L, y1: y, x2: W - Rr, y2: y, stroke: Math.abs(r - 1) < 1e-6 ? C.line : C.grid, "stroke-width": Math.abs(r - 1) < 1e-6 ? 1.5 : 1 }, chart);
+      el("text", { x: L - 8, y: y + 4, fill: C.muted, "font-size": 12, "text-anchor": "end", "font-family": "sans-serif" }, chart).textContent = r.toFixed(1);
+    }
+    el("path", { d: "M" + curve.pts.map(p => xs(p[0]).toFixed(1) + " " + ys(p[1]).toFixed(1)).join(" L"), fill: "none", stroke: mode === "z90" ? "#f87171" : "#fb923c", "stroke-width": 2.5 }, chart);
+    el("text", { x: L + 4, y: T + 12, fill: C.fg, "font-size": 12, "font-family": "sans-serif" }, chart).textContent = "ω₂ / ω₁（輸出 ÷ 輸入角速度）";
+    el("text", { x: W - Rr, y: H - 4, fill: C.muted, "font-size": 12, "text-anchor": "end", "font-family": "sans-serif" }, chart).textContent = "輸入角 θ₁";
+    const t = ((th % TAU) + TAU) % TAU, r = ratio(t, beta, mode);
+    el("line", { x1: xs(t), y1: T, x2: xs(t), y2: H - B, stroke: "#93c5fd", "stroke-width": 1, "stroke-dasharray": "4 3" }, chart);
+    el("circle", { cx: xs(t), cy: ys(r), r: 5, fill: "#fde68a" }, chart);
+  }
+
+  function frame() {
+    const s = draw(mech, th, beta, mode, view, false);
+    const deg = a => ((a * R2D) % 360 + 360) % 360;
+    out("r-in").textContent = deg(th).toFixed(1) + "°";
+    out("r-out").textContent = deg(s.out).toFixed(1) + "°";
+    out("r-err").textContent = (wrap(s.out - th) * R2D).toFixed(2) + "°";
+    out("r-w").textContent = ratio(th, beta, mode).toFixed(3);
+    drawChart();
+  }
+
+  function tick(ts) {
+    if (last !== null && playing) th += (ts - last) / 1000 * (+sv.value) / 60 * TAU;
+    last = ts; frame(); requestAnimationFrame(tick);
+  }
+
+  sb.addEventListener("input", () => { beta = +sb.value * D2R; out("o-b").textContent = sb.value + "°"; rebuild(); frame(); });
+  sv.addEventListener("input", () => { out("o-v").textContent = sv.value + " rpm"; });
+  for (const b of document.querySelectorAll("#modes .btn")) b.addEventListener("click", () => {
+    mode = b.dataset.mode; for (const o of document.querySelectorAll("#modes .btn")) o.setAttribute("aria-pressed", o === b ? "true" : "false");
+    rebuild(); frame(); });
+  const play = out("play");
+  play.addEventListener("click", () => { playing = !playing; play.textContent = playing ? "暫停" : "播放"; play.setAttribute("aria-pressed", playing ? "true" : "false"); });
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { playing = false; play.textContent = "播放"; play.setAttribute("aria-pressed", "false"); }
+  rebuild(); frame(); requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
