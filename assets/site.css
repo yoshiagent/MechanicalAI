@@ -70,5 +70,10 @@ a.card:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
 .callout strong { color: var(--fg); }
 .kinds a, .callout a { color: var(--blue-soft); text-decoration: underline; text-underline-offset: 3px; }
 .kinds a:hover, .callout a:hover { color: var(--fg); }
+/* YouTube Shorts（直式 9:16）＋說明並排，手機改上下 */
+.short-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+.short { flex: 0 0 auto; width: min(100%, 300px); aspect-ratio: 9 / 16; background: var(--deep); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.short iframe { display: block; width: 100%; height: 100%; border: 0; }
+.short-row .callout { flex: 1 1 240px; }
 footer { color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--line); padding-top: 16px; }
 @media (prefers-reduced-motion: reduce) { .card { transition: none; } a.card:hover { transform: none; } }
